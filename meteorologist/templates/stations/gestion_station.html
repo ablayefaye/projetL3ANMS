@@ -1,0 +1,133 @@
+{% extends 'meteorologist.html' %}
+{% block title %}météorologues - stations{% endblock title %}
+
+{% block content %}
+
+    <div class='container mt-2'>
+        <h2>Mes Station(s)</h2>
+        <div class='text-end'>
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <span class='fa fa-plus'></span> station
+            </button>
+        </div
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <form method='POST' action='{% url 'gestion_stationMet' %}'>
+                {% csrf_token %}
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                    <div class="modal-header bg-secondary text-white">
+                        <h5 class="modal-title" id="exampleModalLabel">Ceci est une demande de création de station</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        {{formAdd.as_p}}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+                        <button type="submit" class="btn btn-outline-warning">Envoyer demande</button>
+                    </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        {% if messages %}
+            {% for message in messages %}
+                <div class='alert alert-warning'>
+                    {{message}}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <table class='bg-light table table-bordered mt-2 table-sm table-responsive table-hover'>
+            <tr class='table-warning'>
+                <th>ID</th>
+                <th>Nom Station</th>
+                <th>Coordonnée</th>
+                <th>Technicien(s)</th>
+                <th>Actions</th>
+                <th>Dernier mis à jour</th>
+            </tr>
+            {% for station in  stations %}
+                <tr>
+                    <td class='table-warning'> {{station.id}} </td>
+                    <td> {{station.name}} </td>
+                    <td> ({{station.latitude}} ; {{station.longitude}}) </td>
+                    <td>
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#techs{{station.id}}">
+                        voir liste
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="techs{{station.id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title" id="staticBackdropLabel"> Liste techniciens de la station {{station.name}} </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                
+                                <p>
+                                    Cliquer sur technicien pour le retirer de la station
+                                </p>
+                                {% for tech in technicians %}
+                                    {% if tech.station == station %}
+                                        <ul class='fa fa-ul'>
+                                            <li> <a href='/meteorologist/dropTech/{{tech.id}}' class='btn btn-outline-danger'>{{tech}}</a> </li>
+                                            
+                                        </ul>
+                                                                                
+                                    {% endif %}
+                                {% empty %}
+                                    
+                                {% endfor %}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                    </td>
+                    <td>
+                        <a class='btn btn-primary btn-sm' href='/meteorologist/G_station/{{station.id}}'><span class='fa fa-plus'> voir</span></a>
+                    
+                    </td>
+                    <td style='font-weight:bold'>
+                            {% if station.updated_at %}
+                                {{station.updated_at}}
+                            {% else %}
+                                Jamais
+                            {% endif %}
+                            
+                        </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <div class='alert alert-warning'>
+            {{stations|length}} station{{stations|pluralize:"s"}} 
+        </div>
+
+        <hr>
+        <h2 style='font-style:italic'>Mes Stations sur carte</h2>
+        <div class="alert alert-warning text-center">            
+            <i style='font-weight:bold'>Légende</i>: stations actives: <span style='border-radius:3em' class='badge bg-success'>&nbsp;</span> | stations non actives: <span style='border-radius:3em' class='badge bg-danger'>&nbsp;</span>  
+            
+        </div>
+        {% if stations %}
+            <div class="row">
+                <div class="col-sm-8 col-lg-8 offset-lg-2">
+                    {{m|safe}}
+                </div>
+            </div>
+            {% else %}
+            <div class=' alert alert-dark'>
+                Aucune station n'a encore été créée.
+            </div>
+        {% endif %}
+    </div>
+{% endblock content %}

@@ -1,0 +1,338 @@
+{% extends 'meteorologist.html' %}
+{% block title %}détail station{% endblock title %}
+
+{% block content %}
+    <h2 class="text-center mt-1"> Station {{station}} </h2>
+    <hr>
+    <div class='container mt-3 text-center'>
+        <a href='/meteorologist/G_station/{{id}}?p=details' class='btn {% if p == 'details' %}btn-primary {% else %}btn-outline-primary{% endif %}'>Détails</a>
+        <a href='' class='btn btn-primary'>Tableaux</a>
+        <a href='/meteorologist/G_station/{{id}}?p=users' class='btn {% if p == 'users' %}btn-primary {% else %}btn-outline-primary{% endif %}'>Utilisateurs <span class='badge bg-warning' style='border-radius:1em'>{{users|length}}</span> </a>
+        <a href='/meteorologist/G_station/{{id}}?p=comments' class='btn {% if p == 'comments' %}btn-primary {% else %}btn-outline-primary{% endif %}'>Commentaires <span class='badge bg-warning' style='border-radius:1em'>{{comments|length}}</a>
+        <a href='/meteorologist/yearStatistics/{{id}}' class='btn btn-outline-primary'>Statistiques & tableaux</a>
+
+            {% if messages %}
+                {% for message in messages  %}
+                <div class='alert alert-success mt-2'>
+                    {{message}}
+                </div>
+                {% endfor %}
+            {% endif %}
+            
+        
+    </div>
+
+    <div class="container">
+
+        <p class='text-end'>
+            <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#filter">
+                Filtrer relevés
+            </button>
+        </p>
+        <!-- Modal -->
+        <div class="modal fade" id="filter" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <form method='POST' action='/meteorologist/statisticStation/{{id}}'>
+
+                    {% csrf_token %}
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary  text-white">
+                            <h5 class="modal-title" id="exampleModalLabel">Filtrer relevés selon date</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type='date' name='filter' class='form-control'>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+                            <button type="submit" class="btn btn-outline-primary">Filtrer</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+    {% if tabList %}
+    <div class='{% if p == "default" %}container-fluid {% else %}container{% endif %}'>
+
+
+
+        {% if invalid  %}
+            <div class='alert alert-primary'>
+                {{invalid}}
+            </div>
+        {% endif %}
+        {% if ok %}
+            <div class='alert alert-success'>
+                {{ok}}
+            </div>
+        {% endif %}
+        <div class='text-center bg-light' style='padding-top:1em;border-radius:1em'>
+        <div class='row'>
+        <div class='col-sm-8 offset-sm-2 col-sm-lg offset-sm-lg'>
+            filtre du <strong style="font-style: italic">{{dat|date:'M - Y'}}</strong>
+        <table style='{% if p == 'default' %}font-size:10px;height:8.7em{% endif %}' class='{% if p != 'default' %}table table-sm{% endif %} table-bordered'>
+            <tr>
+                <th class='bg-primary text-white'>Valeur (mm)</th>
+                {% for releve in tabList %}
+                    <td {% if day == releve.created_at.day %}class='bg-info'{% endif %}>
+                        <button type="button" class="{% if p != 'default' %}btn btn-sm btn-outline-primary {% endif %}" data-bs-toggle="modal" data-bs-target="#modify{{releve.id}}">
+                        {{releve.value}}
+                        </button><!-- Modal -->
+                        <div class="modal fade" id="modify{{releve.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <form method='POST' action='/meteorologist/statisticStation/{{id}}?p={{p}}'>
+                                {% csrf_token %}
+                                <div class="modal-content">
+                                    <div class="modal-header bg-primary text-white">
+                                        <h5 class="modal-title" id="exampleModalLabel">Modification relevé effectué le {{releve.created_at|date:'D, d M Y'}} </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    
+                                    <div class="modal-body">
+                                        <input type='hidden' name='p' value='{{p}}'>
+                                        <input type='text' class='form-control' name='releve' value='{{releve.value}}'>
+                                        <input type='hidden'  name='idR' value='{{releve.id}}'>
+                                        {% comment %} <input type='hidden' name='{{releve.id}}' value='{{releve.id}}'> {% endcomment %}
+                                        
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+                                        <button type="submit" class="btn btn-primary">modifier</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        </div>
+                    </td>
+
+                    
+                {% endfor %}
+            </tr>
+            <tr>
+                <th class='bg-warning text-white'>Date</th>
+                {% for releve in tabList %}
+                     
+                    {% if day == releve.created_at.day %} 
+                    <td class='bg-info'>{{releve.created_at|date:'d/m/y'}}</td>
+                    {% else %}
+                    <td>{{releve.created_at|date:'d/m/y'}}</td>
+                    {% endif %}
+                    
+                {% endfor %}
+                
+            </tr>
+        </table>
+        </div>
+        </div>
+        <strong class="{%if met.theme == "dark"%}  text-dark {%endif%}"><i>Moyenne en (mm): <span class='text-info'> {{moy}} </span> </i></strong>
+        <br>
+        <strong class="{%if met.theme == "dark"%}  text-dark {%endif%}"><i>Min en (mm): <span class='text-info'> {{mini}} </span> </i></strong>
+        <br>
+        <strong class="{%if met.theme == "dark"%}  text-dark {%endif%}"><i>Max (en mm) : <span class='text-info'> {{maxi}} </span> </i></strong>
+
+        <hr>
+        </div>
+        
+        <div class="container text-center mt-3">
+            <a href='/meteorologist/statisticStation/{{id}}?p=default' class='btn btn-sm {% if p == 'default' %}btn-warning {% else %}btn-outline-warning{% endif %}'>Mois</a>
+            <a href='/meteorologist/statisticStation/{{id}}?p=s1' class='btn btn-sm {% if p == "s1" %}btn-warning {% else %}btn-outline-warning{% endif %}'>semaine 1</a>
+            <a href='/meteorologist/statisticStation/{{id}}?p=s2' class='btn btn-sm {% if p == "s2" %}btn-warning {% else %}btn-outline-warning{% endif %}'>semaine 2</a>
+            <a href='/meteorologist/statisticStation/{{id}}?p=s3' class='btn btn-sm {% if p == "s3" %}btn-warning {% else %}btn-outline-warning{% endif %}'>semaine 3</a>
+            <a href='/meteorologist/statisticStation/{{id}}?p=s4' class='btn btn-sm {% if p == "s4" %}btn-warning {% else %}btn-outline-warning{% endif %}'>semaine 4</a>
+            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#graphe">
+            voir graphe
+            </button>
+
+            <!-- Modal -->
+            <div class="modal  fade" id="graphe" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="staticBackdropLabel">Statistique graphique</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="bar-tab" data-bs-toggle="tab" data-bs-target="#bar" type="button" role="tab" aria-controls="bar" aria-selected="true">Barre</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="line-tab" data-bs-toggle="tab" data-bs-target="#line" type="button" role="tab" aria-controls="line" aria-selected="false">Ligne</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pie-tab" data-bs-toggle="tab" data-bs-target="#pie" type="button" role="tab" aria-controls="pie" aria-selected="false">Pie</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="bar" role="tabpanel" aria-labelledby="bar-tab">
+                    <div class="modal-body">
+                        <canvas id="myChart" width="400" height="200"></canvas>
+                    </div>
+                    <script>
+                        var ctx = document.getElementById('myChart').getContext('2d');
+                        var myChart = new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: [
+                                        {% for r in tabList %}
+                                            '{{r.created_at|date:"d"}}',
+                                        {% endfor %}
+                                        ],
+                                datasets: [{
+                                    label: '# relevé en mm',
+                                    data: [{% for r in tab %} {{r}}, {% endfor %}],
+                                    backgroundColor: [
+                                        'rgba(255, 99, 132, 0.2)',
+                                        'rgba(54, 162, 235, 0.2)',
+                                        'rgba(255, 206, 86, 0.2)',
+                                        'rgba(75, 192, 192, 0.2)',
+                                        'rgba(153, 102, 255, 0.2)',
+                                        'rgba(255, 159, 64, 0.2)'
+                                    ],
+                                    borderColor: [
+                                        'rgba(255, 99, 132, 1)',
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 206, 86, 1)',
+                                        'rgba(75, 192, 192, 1)',
+                                        'rgba(153, 102, 255, 1)',
+                                        'rgba(255, 159, 64, 1)'
+                                    ],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    </script>
+                </div>
+                <div class="tab-pane fade" id="line" role="tabpanel" aria-labelledby="line-tab">
+                     <div class="modal-body">
+                        <canvas id="myLineChart" width="400" height="200"></canvas>
+                    </div>
+                    <script>
+                        var ctx1 = document.getElementById('myLineChart').getContext('2d');
+                        var myLineChart = new Chart(ctx1, {
+                            type: 'line',
+                            data: {
+                                labels: [
+                                        {% for r in tabList %}
+                                            '{{r.created_at|date:"d"}}',
+                                        {% endfor %}
+                                        ],
+                                datasets: [{
+                                    label: '# relevé en mm',
+                                    data: [{% for r in tab %} {{r}}, {% endfor %}],
+                                    backgroundColor: [
+                                        'rgba(255, 99, 132, 0.2)',
+                                        'rgba(54, 162, 235, 0.2)',
+                                        'rgba(255, 206, 86, 0.2)',
+                                        'rgba(75, 192, 192, 0.2)',
+                                        'rgba(153, 102, 255, 0.2)',
+                                        'rgba(255, 159, 64, 0.2)'
+                                    ],
+                                    borderColor: [
+                                        'rgba(255, 99, 132, 1)',
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 206, 86, 1)',
+                                        'rgba(75, 192, 192, 1)',
+                                        'rgba(153, 102, 255, 1)',
+                                        'rgba(255, 159, 64, 1)'
+                                    ],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    </script>
+                </div>
+                <div class="tab-pane fade" id="pie" role="tabpanel" aria-labelledby="pie-tab">
+                    <div class="modal-body">
+                        <canvas id="myPieChart" width="400" height="200"></canvas>
+                    </div>
+                    <script>
+                        var ctx2 = document.getElementById('myPieChart').getContext('2d');
+                        var myPieChart  = new Chart(ctx2, {
+                            type: 'pie',
+                            data: {
+                                labels: [
+                                        {% for r in tabList %}
+                                            '{{r.created_at|date:"d"}}',
+                                        {% endfor %}
+                                        ],
+                                datasets: [{
+                                    label: '# relevé en mm',
+                                    data: [{% for r in tab %} {{r}}, {% endfor %}],
+                                    backgroundColor: [
+                                        'rgba(255, 99, 132, 0.2)',
+                                        'rgba(54, 162, 235, 0.2)',
+                                        'rgba(255, 206, 86, 0.2)',
+                                        'rgba(75, 192, 192, 0.2)',
+                                        'rgba(153, 102, 255, 0.2)',
+                                        'rgba(255, 159, 64, 0.2)',
+                                        
+                                    ],
+                                    borderColor: [
+                                        'rgba(255, 99, 132, 1)',
+                                        'rgba(54, 162, 235, 1)',
+                                        'rgba(255, 206, 86, 1)',
+                                        'rgba(75, 192, 192, 1)',
+                                        'rgba(153, 102, 255, 1)',
+                                        'rgba(255, 159, 64, 1)'
+                                    ],
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    </script>
+                </div>
+                </div>
+                
+                <p>
+                    <u>
+                        relevé en <strong>mm</strong> en fonction de la date <strong>en jour</strong>, filtre: <strong>{{t.created_at|date:'M Y'}}</strong>
+                    </u>
+                </p>
+                <div class="modal-footer">
+                    
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+                </div>
+                </div>
+            </div>
+            </div>
+            <a class='btn btn-primary btn-sm' href='/meteorologist/exports/{{id}}/{{my_rain.created_at.year}}/{{my_rain.created_at.month}}?p={{p}}'>Exporter PDF</a>
+        </div>
+        <div class='alert alert-warning mt-2'>
+        {{tabList|length}} relevé{{tabList|pluralize:'s'}} 
+        </div>
+    </div>
+    {% else %}
+    <div class=' container mt-3 alert alert-warning'>
+        Cette station n'as pas encore de relevé enregistré dans cette période
+    </div>
+    {% endif %}
+{% endblock content %}

@@ -1,0 +1,35 @@
+{% extends 'admin.html' %}
+
+{% block title %}Station - modifier{% endblock title %}
+{% block content %}
+     <div class='container-md mt-5'>
+            {% if emailNotOk %}
+        <div class="alert alert-info"> {{emailNotOk}} </div>
+        {% endif %}
+        {% if errorTel %}
+            <div class="alert alert-danger"> {{errorTel}} </div>
+        {% endif %}
+        {% if errorFirstname %}
+            <div class="alert alert-danger"> {{errorFirstname}} </div>
+        {% endif %}
+        {% if errorLastname %}
+            <div class="alert alert-danger"> {{errorLastname}} </div>
+        {% endif %}  
+        <div class="row bg-light {% if admin.theme == 'dark' %}text-dark{% endif %} p-3">
+            <div class="col-sm-8  offset-sm-2 col-lg-8 offset-lg-2 ">
+                <form action="#" method="POST">
+                    {% csrf_token %}
+                    <h2 style='text-shadow:#000 1px 1px 1px;font-style:italic'>Modifier Station <i>{{formEdit.name.value}}</i> </h2>
+                    <hr>
+                     {{formEdit.as_p}}
+                    <p class='text-center'>
+                        <a href='{% url 'gestion_station' %}' class='btn btn-secondary btn-lg'>annuler</a>
+                        <button type='submit' class='btn btn-outline-secondary btn-lg'>modifier technicien</button>
+                    </p>
+
+                </form>
+            </div>
+            
+        </div>
+    </div>  
+{% endblock content %}

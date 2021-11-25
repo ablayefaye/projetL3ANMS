@@ -1,0 +1,74 @@
+{% extends 'meteorologist.html' %}
+
+{% block title %}adminstration - profil{% endblock title %}
+
+{% block content %}
+<div class = 'container mt-5'>
+        {% if messages %}
+            <div class="alert alert-success">
+                {% for message in messages %}
+                    {{message}}
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% load static %}
+        <div class="jumbotron bg-light p-5 {% if met.theme == 'dark'  %}text-dark{% endif %}" >
+            <h2>Mon profil</h2>
+            <div class="row">
+                <div class="col-sm-4">
+                    <img style="border-radius: 10em;width:20em;height:15em;" src="{%if met.profile %}/media/{{met.profile}}{%else%} {% static 'images/default.png' %} {%endif%}" alt="">
+                </div>
+                <div class="col-sm-8">
+                    <h1 class="display-4">{{met.firstname}}, {{met.lastname}}!</h1>
+                    <p class="lead">
+                        Météorologue de  <strong>ANMS</strong>, <span class='text-info'>A</span>gence <span class='text-info'>N</span>ational de la <span class='text-info'>M</span>étéorologie <span class='text-info'>S</span>énégalaise.
+                    </p> 
+                        
+                    <p>
+                        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Vel sunt quaerat aliquam hic provident autem earum minima quam expedita perferendis? Modi cupiditate facere quia architecto sed aperiam obcaecati non maiores.
+                        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nostrum repudiandae velit quos et rem cum, deserunt, natus hic possimus aliquam dolore id, eligendi magnam voluptatibus veniam delectus nemo officia dolorum?        
+                    </p>
+                </div>
+            </div>
+            
+            <hr class="my-4">
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-lg btn-outline-info" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                voir profil
+            </button>
+            
+            <!-- Modal -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    
+                    <div class="modal-content">
+                        <form method='POST' action="{% url 'gestion_profilMet' %}" enctype='multipart/form-data'>
+                            {% csrf_token %}
+                            <div class="modal-header bg-info text-white">
+                                <h5 class="modal-title" id="exampleModalLabel">Mes informations</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                
+                                {{formEdit.as_p}}
+                                <p>
+                                    <label>Ancien mot de passe :</label>
+                                    <input type='password' value='{{old}}' name='old' class='form-control'>
+                                
+                                    <label>Nouveau mot de passe :</label>
+                                    <input type='password' value='{{new}}' name='new' class='form-control'>
+                                </p>
+                                    
+                                
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+                                <button type="submit" class="btn btn-outline-info">Modifier informations</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

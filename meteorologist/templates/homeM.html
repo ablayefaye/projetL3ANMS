@@ -1,0 +1,42 @@
+{% extends 'meteorologist.html' %}
+{% block title %} meteorologist - accueil{% endblock title %}
+
+{% block content %}
+    <div class='container mt-5'>
+        {% if messages %}
+            {% for message in messages  %}
+            <div class='alert alert-success'>
+                {{message}}
+            </div>
+            {% empty %}{% endfor %}
+        {% endif %}
+        <p>
+            <h2 class='text-white text-center'>Bienvenu sur l'espace Météorologues de <strong class='text-dark'>ANMS</strong>,</h2>
+            <div class='card-body' style='font-style:italic;'>{% lorem 1 b  %}</div>  
+        </p>
+        <hr>
+        <h2 style='font-style:italic'>Technicens et Stations</h2>
+        <div class='alert alert-info row' style='font-size: 1.5em'>
+           
+            <div class='col-6 border p-4'>
+                <h2><span class=' text-warning fa fa-users'></span> Techniciens</h2>
+                actif: {{techActifs|length}}<br> 
+                inactif: {{techInactifs|length}} <br>
+                total: {{techs}} <br>
+                <div class='text-center'>
+                    <a class='btn btn-lg btn-outline-warning' href='gestion_technicianMet'>voir plus</a>
+                </div>
+            </div>
+            <div class='col-6 border p-4'>
+                <h2><span class='fa fa-toolbox text-warning'></span> Stations</h2>
+                actif: {{stationActifs|length}}<br> 
+                inactif: {{stationInactifs|length}} <br>
+                total: {{stations}} <br>
+                <div class='text-center'>
+                    <a class='btn btn-lg btn-outline-warning' href='gestion_stationMet'>voir plus</a>
+                </div>
+            </div>
+        </div>
+        <hr>
+    </div>
+{% endblock content %}

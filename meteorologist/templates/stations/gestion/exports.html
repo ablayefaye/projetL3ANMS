@@ -1,0 +1,48 @@
+<html lang='fr'>
+<head>
+    <meta charset='utf-8'>
+    {% load static %}
+    <link rel="stylesheet" href=" {% static 'dist/css/bootstrap.css' %} ">
+
+</head>
+<body>
+<u><h1 style='color:blue; font-weigth:bold;'>Station {{station.name}}, statistique mensuelle année {{year}} </h1></u>
+<i>
+    <p>
+        Coordonnées : Latitude -> {{station.latitude}} , Longitude -> {{station.longitude}} <br>
+        Statut: {% if station.statut %}<span style='color:green'>actif</span> {% else %}<span style='color:red'>non actif</span>{% endif %} 
+    </p>
+    <hr>
+</i>
+<table border='1px' style="padding:1px">
+
+            <tr>
+                <th>Mois</th>
+                {% for releve in data %}
+                    <td >
+                        {{releve.name}}                        
+                    </td>    
+                {% endfor %}
+            </tr>
+            <tr>
+                <th>Valeur (mm)</th>
+                {% for releve in data %}
+                     
+                     
+                    
+                    <td>{{releve.value}}</td>
+                {% endfor %}
+                
+            </tr>
+</table>
+<br>
+<i>
+    Minimum: {{mini}} <br>
+    Maximum: {{maxi}} <br>
+    Moyenne: {{moy}} <br>
+</i>
+<hr>
+<u><h2 style='color:red; text-align:center'>Statistique relevé du mois {{r.created_at|date:'M Y'}}</h2></u>
+<p><i>Exportation sous format pdf faite le {% now "D d M Y" %} </i></p>
+</body>
+</html>

@@ -1,0 +1,79 @@
+{% extends 'technician.html' %}
+
+{% block title %}
+    technien - relevé
+{% endblock title %}
+
+{% block content %}
+    <div class='container m-2'>
+        {% if messages %}
+            {% for message in messages  %}
+                <div class='alert alert-info'>
+                    {{message}}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    {% if lastRains %}
+        <div class=' mt-3 {% if tech.theme == 'dark' %}text-dark{% endif %} container bg-light'>
+        <div class='row'>
+            <div class='col-sm-8 offset-sm-2 p-5'>
+                <h4>Liste des relevés récents que vous avez éffectué sur la station <i>{{tech.station.name}}</i></h4>
+                <hr>
+                <table class='table table-bordered'>
+                    <tr class='table-primary'>
+                        <td>ID</td>
+                        <td>Date relevé</td>
+                        <td>Valeur</td>
+                        <td>Action</td>
+                    </tr>
+                    {% for r in lastRains %}
+                        <tr>
+                            <td class='table-success'> {{r.id}} </td>
+                            <td> {{r.created_at}} </td>
+                            <td> {{r.value}} </td>
+                            <td> 
+                                <!-- Button trigger modal -->
+                                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#edit{{r.id}}">
+                                <span class='fa fa-edit'></span>
+                                </button>
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="edit{{r.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <form method='POST' action='#'>
+                                        <div class="modal-content">
+                                        <div class="modal-header bg-success text-white">
+                                            <h5 class="modal-title" id="exampleModalLabel">Modal {{r.id}}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            
+                                                {% csrf_token %}
+                                                <p>
+                                                    <input type='hidden' name='id' value='{{r.id}}'>
+                                                    <input type='text' name='v' value={{r.value}} class='form-control form-control-lg'>
+                                                </p>
+                                            
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+                                            <button type="submit" class="btn btn-outline-success">Modifier</button>
+                                        </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+        </div>
+    {% else %}
+        <div class='alert alert-info'>
+            Liste relevés vide.
+        </div>
+    {% endif %}
+{% endblock content %}

@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+    {% load static %}
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>ANMS - {% block title %}{% endblock title %}</title>
+        <link rel="stylesheet" href=" {% static 'dist/css/bootstrap.css' %} ">
+        <link rel="stylesheet" href=" {% static 'dist/css/style.css' %} ">
+        <link rel="stylesheet" href=" {% static 'fonts/css/all.css' %} "> 
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Caladea">
+
+        <style>
+            body {
+            font-family: 'Caladea', serif;
+                /* font-size: 40px; */
+            }
+            .content {
+            background-image: url("/static/images/bodyAdmin.jpg"); /* The image used */
+            background-color: #cccccc; /* Used if the image is unavailable */
+            height: auto; /* You must set a specified height */
+            background-position: center; /* Center the image */
+            background-repeat: no-repeat; /* Do not repeat the image */
+            background-size: cover; /* Resize the background image to cover the entire container */
+            }
+        </style>
+    </head>
+    <body class='content '>
+        <div class='container-fluid bg-secondary text-uppercase'>
+            <h3 style='font-style:italic;text-shadow:#FFF 1px 1px 1px;' class='text-white text-center'>Espace Administrateur</h3>
+            <hr class='bg-white'>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="{% url 'homeA' %}"><h3 style='font-style:italic;text-shadow:#FFF 1px 1px 1px;' class='text-white'>ANMS</h3></a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav">
+                        
+                        <li class="nav-item">
+                            <a class="{% if page == 'station' %}active{% endif %}  nav-link" href="{% url 'gestion_station' %}">Gestion Stations</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="{% if page == 'technician' %}active{% endif %} nav-link" href="{% url 'gestion_technician' %}">Gestion Techniciens</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="{% if page == 'meteorologist' %}active{% endif %} nav-link" href="{% url 'gestion_meteorologist' %}">Gestion Météorologues</a>
+                        </li>
+                        <li class="nav-item"> 
+                            <a class="{% if page == 'gestion_demandes' %}active{% endif %} nav-link" href="{% url 'gestion_demandes' %}">Gestion Demandes <span class='badge bg-{% if admin.theme == 'info' %}dark{% else %}info{% endif %}' style='border-radius:1em'>{{demandsW}} </span></a>
+                        </li>
+
+
+                        
+                        <li class="nav-item">
+                            <a class="{% if page == 'gestion_regions' %}active{% endif %} nav-link" href="{% url 'gestion_regions' %}">Régions</a>
+                        </li>
+                                        
+                        
+                        <li class="nav-item dropdown ">
+                            <a class="nav-link btn btn-outline-info dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{admin.firstname}} {{admin.lastname}} 
+                            <img style='height:1.5em;width:1.6em;border-radius:1em;' src='{% if admin.profile %}/media/{{admin.profile}}{% else %}{% static 'images/default.png' %}{% endif %}'>
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <li><a class="dropdown-item" href="{% url 'gestion_profil' %}">Profil</a></li>
+                                <li><a data-bs-toggle="modal" data-bs-target="#disconnect" class="dropdown-item" href='#'>Déconnexion</a></li>
+                            </ul>
+                        </li>
+                        <div class="modal fade" id="disconnect" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                            <div class="modal-header bg-info text-white">
+                                <h5 class="modal-title" id="exampleModalLabel">Déconnexion ...</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Voulez-vous vraiment vous déconnecter ?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Non, Annuler</button>
+                                <a href="{% url 'disconnect' %}" class="btn btn-danger">Oui, se déconnecter</a>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+
+                    </ul>
+                    </div>
+
+                </div>
+            </nav>
+        </div>
+        
+        {% block content %}{% endblock content %}    
+        <script src="{% static 'dist/js/jquery.js' %}"></script>
+        <script src="{% static 'dist/js/bootstrap.js' %}"></script>
+        <script>
+            const data = '{{liste}}'
+            const typ = '{{typ}}'
+            if(typ == 'met' || typ == 'tech'){
+                console.log(data)
+
+                const rdata = JSON.parse(data.replace(/&quot;/g, '"'))
+                console.log(rdata)
+
+                const input = document.getElementById('search_here')
+                console.log(input)
+
+                let filteredArr = []
+
+                input.addEventListener('keyup', (e)=>{
+                    box.innerHTML = ""
+                    filteredArr = rdata.filter(info=> info['email'].includes(e.target.value))
+                    console.log(filteredArr)
+                    if (filteredArr.length > 0){
+                        filteredArr.map(info=>{
+                            box.innerHTML += `<a class='btn btn-sm btn-info' href='/administration/resultSearch/${info['id']}/${info['role']}' >${info['email']}</a><br>`
+                        })
+                    } else {
+                        box.innerHTML = "<b class='text-info'>Pas de résultat pour ce recherche...</b>"
+                    }
+                })
+            }else if(typ == 'stat'){
+
+                console.log(data)
+
+                const rdata = JSON.parse(data.replace(/&quot;/g, '"'))
+                console.log(rdata)
+
+                const input = document.getElementById('search_here')
+                console.log(input)
+
+                let filteredArr = []
+
+                input.addEventListener('keyup', (e)=>{
+                    box.innerHTML = ""
+                    filteredArr = rdata.filter(info=> info['name'].includes(e.target.value.toUpperCase()))
+                    console.log(filteredArr)
+                    if (filteredArr.length > 0){
+                        filteredArr.map(info=>{
+                            box.innerHTML += `<a class='btn btn-sm btn-info' href='/administration/gestion_station?stat=${info['id']}#${info['id']}' >${info['name']}</a><br>`
+                        })
+                    } else {
+                        box.innerHTML = "<b class='text-info'>Pas de résultat pour ce recherche...</b>"
+                    }
+                })
+
+            }else if(typ == 'reg'){
+                console.log(data)
+
+                const rdata = JSON.parse(data.replace(/&quot;/g, '"'))
+                console.log(rdata)
+
+                const input = document.getElementById('search_here')
+
+                console.log(input)
+
+                let filteredArr = []
+
+                input.addEventListener('keyup', (e)=>{
+                    box.innerHTML = ""
+                    filteredArr = rdata.filter(info=> info['name'].includes(e.target.value.toUpperCase()))
+                    console.log(filteredArr)
+                    if (filteredArr.length > 0){
+                        filteredArr.map(info=>{
+        
+                            box.innerHTML += `<a class='btn btn-sm btn-info' href='/administration/gestion_regions?reg=${info['id']}#${info['id']}' >${info['name']}</a><br>`
+                        })
+                    } else {
+                        box.innerHTML = "<b class='text-info'>Pas de résultat pour ce recherche...</b>"
+                    }
+                })
+
+            }
+            
+
+
+        
+        </script>
+        <footer class='text-center p-4 bg-secondary text-white mt-5' style='padding:1em'>
+            réserver pour ANMS 
+            
+        </footer>
+    </body>
+</html>

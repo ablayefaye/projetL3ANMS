@@ -1,0 +1,25 @@
+{% extends 'admin.html' %}
+{% block title %}region - modifier région{% endblock title %}
+
+
+{% block content %}
+    <div class='container mt-5'>
+    
+        <div class='row bg-light'>
+        <div class='col-sm-6 mt-5 offset-sm-3 col-lg-6 offset-lg-3 col-md-8 offset-md-2'>
+            <h2 style='text-shadow:#000 1px 1px 1px;font-style:italic' class=' {%if admin.theme == 'dark' %}text-dark{%endif%} '>Modifier Région <span class='text-info'>{{region}}</span></h2>
+            <hr>
+            <form method='POST' action="/administration/editRegion/{{id}}">
+                {% csrf_token %}
+                <p class="text-center">
+                    {{formEdit.name}}
+                </p>
+                <p class="text-center">
+                    <button class='btn btn-outline-secondary' type='submit'>Enregistrer modification</button>
+
+                </p>                   
+            </form>
+        </div>
+        </div>
+    </div>
+{% endblock content %}

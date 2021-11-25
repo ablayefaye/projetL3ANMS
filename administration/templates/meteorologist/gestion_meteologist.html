@@ -1,0 +1,309 @@
+{% extends 'admin.html' %}
+
+{% block title %}météologue - liste{% endblock title %}
+
+{% block content %}
+   <div class="container mt-1">
+    <h2 style='text-shadow:#000 1px 1px 1px;font-style:italic'>Liste Météorologues</h2>
+    {% comment %}  {% endcomment %}
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-light " data-bs-toggle="modal" data-bs-target="#rech">
+        <span class='fa fa-search'> météorologue</span>
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="rech" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+            <h5 class="modal-title" id="exampleModalLabel">Saisir Mail météorologue à rechercher</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <input id="search_here" class="form-control mb-3" placeholder="Saisir Mail ..." />
+            <div id="box"></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+        </div>
+    </div>
+    </div>
+    
+    {% comment %}  {% endcomment %}
+
+    <p class='text-end'>
+    <button data-bs-toggle="modal" data-bs-target="#addMet" class='btn btn-sm btn-info'><span class='fa fa-plus'>&nbsp;ajouter météorologue</span></button>
+    
+    <div class="modal fade" id="addMet" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form action="{% url 'gestion_meteorologist' %}" method="post">
+                {% csrf_token %}
+                <div class="modal-content">
+                    <div class="modal-header text-white bg-info">
+                    <h5 class="modal-title" id="exampleModalLabel"> <span class="fa fa-plus"></span>&nbsp;Ajouter Météorologue</h5>
+                    <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        {% comment %} {{formAdd}} {% endcomment %}
+                        <p>
+                            {{formAdd.as_p}}
+                        </p>
+
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+                    <button type="submit" class="btn btn-info">créer météologue</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    </p>
+        {{qs_json}}
+        {% if messages %}
+            <div class="alert alert-info">
+                {% for message in messages %}
+                    {{message}}
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% if addOk %}
+            <div class="alert alert-infp"> {{addOk}} </div>
+        {% endif %}
+        {% if trashOk %}
+            <div class="alert alert-info"> {{trashOk}} </div>
+        {% endif %}
+        {% if emailNotOk %}
+            <div class="alert alert-info"> {{emailNotOk}} </div>
+        {% endif %}
+        {% if errorTel %}
+            <div class="alert alert-danger"> {{errorTel}} </div>
+        {% endif %}
+         {% if errorConnection %}
+            <div class="alert alert-info"> {{errorConnection}} </div>
+        {% endif %}
+        
+        {% if errorFirstname %}
+                <div class="alert alert-danger"> {{errorFirstname}} </div>
+            {% endif %}
+            {% if errorLastname %}
+                <div class="alert alert-danger"> {{errorLastname}} </div>
+            {% endif %}
+        
+        <table class="table bg-light table-responsive table-bordered table-sm table-hover">
+            <tr class="table-info">
+                <th>ID</th>
+                <th>Prénom</th>
+                <th>Nom</th>
+                <th>Adresse email</th>
+                <th>Téléphone</th>
+                <th>Statut</th>
+                <th colspan="4" class="text-center">action</th>
+                <th>Dernière connexion</th>
+            </tr>
+            {% for meteorologist in meteorologists %}
+                <tr>
+                    <td class='table-info'> {{meteorologist.id}} </td>
+                    <td> {{meteorologist.firstname}} </td>
+                    <td>{{meteorologist.lastname}}</td>
+                    <td>{{meteorologist.email}}</td>
+                    <td>{{meteorologist.tel}}</td>
+                    <td>
+                        {% if meteorologist.statut %}
+                            <div class="spinner-grow bg-success spinner-grow-sm" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        {% else %}
+                            <div class="spinner-grow bg-danger spinner-grow-sm" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        {% endif %}
+                    </td>
+
+                    {% comment %} editer  {% endcomment %}
+                    <td><a href="/administration/editMet/{{meteorologist.id}}" class="btn  btn-sm btn-warning"><span class="fa fa-edit"></span></a></td>
+                   {% comment %} fin editer {% endcomment %}
+                    <td>
+                    {% comment %} mettre en corbeil {% endcomment %}
+                        <button data-bs-toggle="modal" data-bs-target="#delete{{meteorologist.id}}" class="btn btn-sm  btn-danger"><span class="fa fa-archive"></span></button>
+
+                        <div class="modal fade" id="delete{{meteorologist.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header text-white bg-info">
+                                        <h5 class="modal-title" id="exampleModalLabel"> Archiver météorologue ?</h5>
+                                        <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        
+                                        <div class="modal-footer">
+                                        <button type="button" class="btn btn-lg btn-outline-primary" data-bs-dismiss="modal">non</button>
+                                        <a  href="/administration/trashMet/{{meteorologist.id}}" class="btn btn-outline-danger btn-lg">oui</a>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div> 
+                    {% comment %} fin mettre en corbeil {% endcomment %}
+                    </td>
+                    <td>
+                        {% comment %} voir {% endcomment %}
+                        <button data-bs-toggle="modal" data-bs-target="#show{{meteorologist.id}}" class="btn btn-sm  btn-primary"><span class='fa fa-eye'></span></span></button>
+                        
+                        <div class="modal fade" id="show{{meteorologist.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header text-white bg-info">
+                                    <h5 class="modal-title" id="exampleModalLabel">Details {{meteorologist}} </small> </h5>
+                                    <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    {% load static %}
+                                    <div class='text-center'>
+                                    <img style='width:auto; height:20em; border-radius:0.5em;' src="{%if meteorologist.profile %}/media/{{meteorologist.profile}}{%else%} {% static 'images/default.png' %} {%endif%}">
+                                    </div> 
+                                    <br>
+                                    <strong class="text-info">Prénom:</strong> {{meteorologist.firstname}} <br>
+                                    <strong class="text-info">Nom:</strong> {{meteorologist.lastname}} <br>
+                                    <strong class="text-info">Adresse:</strong> {{meteorologist.address}} <br>
+                                    <strong class="text-info">Téléphone:</strong> {{meteorologist.tel}} <br>
+                                    <strong class="text-info">Email:</strong> {{meteorologist.email}} <br>
+                                    <strong class="text-info">Statut:</strong> {% if meteorologist.statut %}<strong class="text-success">active</strong> {% else %}<strong class="text-danger">non actif</strong>{% endif %} <br>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-lg btn-outline-info" data-bs-dismiss="modal">fermer</button>
+                                </div>
+                            </div>
+                        </div>
+                        {% comment %} fin voir {% endcomment %}
+                    </td>  
+                    <td>
+                        {% if meteorologist.statut %}
+                            <button data-bs-toggle="modal" data-bs-target="#des{{meteorologist.id}}" class="btn btn-sm  btn-danger">désactivé</span></button>
+                            <div class="modal fade" id="des{{meteorologist.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header text-white bg-info">
+                                                <h5 class="modal-title" id="exampleModalLabel">Désactivé Météorologue ? <small> <br> la désactivation retir tous les priviléges à ce météorologue.</small> </h5>
+                                                <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                                
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-lg btn-outline-primary" data-bs-dismiss="modal">non</button>
+                                                <a  href="/administration/disableMet/{{meteorologist.id}}" class="btn btn-outline-danger btn-lg">oui</a>
+                                            </div>
+                                        </div>
+                                </div>
+                            </div> 
+                            {% else %}
+                            <button data-bs-toggle="modal" data-bs-target="#act{{meteorologist.id}}" class="btn btn-sm  btn-success">activé</button>
+                            <div class="modal fade" id="act{{meteorologist.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header text-white bg-info">
+                                            <h5 class="modal-title" id="exampleModalLabel"> Activé météorologue ?</h5>
+                                            <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-lg btn-outline-danger" data-bs-dismiss="modal">non</button>
+                                            <a  href="/administration/enableMet/{{meteorologist.id}}" class="btn btn-outline-success btn-lg">oui</a>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div> 
+                        {% endif %}
+                    </td>  
+                    <td style='font-weight:bold'>
+                        {% if meteorologist.is_online %}
+                        <span class='text-success'>En ligne</span>
+                        {% elif meteorologist.last_connection%}
+                            {{meteorologist.last_connection}}
+                        {% else %}
+                            Jamais
+                        {% endif %}
+                        
+                       
+                    </td>
+
+                </tr>
+            {% endfor %}
+        </table>
+        <div class='alert alert-info'>
+            {% if metLen > 1 %}
+                {{metLen}} météorologues.
+            {% elif metLen == 1 %}
+                {{metLen}} météorologue.
+            {% else %}
+                Aucun météologue n'est encore été registrer. Veuillez vérifier les archives.
+            {% endif %}
+        </div>
+
+        {% comment %} corbeil {% endcomment %}
+        <!-- Button trigger modal -->
+        <p class='text-center' >
+            <button type="button" class="{% if not metTrashLen %}disabled{% endif %} btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#showTrash">
+                voir archives météorologue <span class="badge bg-info"> {{metTrashLen}} </span>
+            </button>
+        </p>
+
+        <!-- Modal -->
+        <div class="modal fade" id="showTrash" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="exampleModalLabel">Archives météorologue</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    
+                    <table class='table table-responsive table-sm table-bordered'>
+                    <tr>
+                        <th>ID</th>
+                        <th>Météorologue</th>
+                        <th>Email</th>
+                        <th>Date archive</th>
+                        <th>Actions</th>
+                    </tr>
+                    {% for meteorologist in meteorologistsInTrash  %}
+                        <tr>
+                            <td>{{meteorologist.id}}</td>
+                            <td>
+                                </strong>{{meteorologist.firstname}} {{meteorologist.lastname}} 
+                                
+                            </td>
+                            <td>{{meteorologist.email}}</td> 
+                            <td>
+                             {{meteorologist.trash_at| date:'D d M Y'}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            </td>
+                            <td><a href="/administration/restorMet/{{meteorologist.id}}" class='btn btn-success'><span class='fa fa-trash-restore'></span></a></td>
+                            
+                            
+                        </tr>
+
+                    {% endfor %}
+                    </table>
+                    
+                    <div  class='alert alert-info'>
+                        
+                        {% if metTrashLen > 1 %}
+                            {{metTrashLen}} météorologues.
+                        {% elif metTrashLen == 1 %}
+                            {{metTrashLen}}  météorologue.
+                        {% else %}
+                            Aucun  météorologue archiver :)
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    
+                    
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
+        {% comment %} fin Corbeil {% endcomment %}
+   </div>
+{% endblock content %}

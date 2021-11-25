@@ -1,0 +1,274 @@
+{% extends 'admin.html' %}
+
+{% block title %}
+    station - détails
+{% endblock title %}
+
+{% block content %}
+    <div class="container mt-2">
+        <h2 style='text-shadow:#000 1px 1px 1px;font-style:italic'>Liste stations</h2>
+        <input id="search_here" class="form-control mb-3" placeholder="Nom de la station à rechercher ici svp .." />
+        <div id="box"></div>
+        <p class="text-end">
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                <span class="fa fa-plus">&nbsp;ajouter station</span>
+            </button>
+        </p>
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <form method="post" action='{% url "gestion_station" %}'>
+            {% csrf_token %}
+            <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="exampleModalLabel"><span class="fa fa-plus">&nbsp;Ajouter Station</span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div> 
+                <div class="modal-body">
+                    {{formAdd.as_p}}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+                    <button type="submit" class="btn btn-info">créer station</button>
+                </div>
+                </div>
+            </div>
+            </form>
+        </div>
+        {% if messages %}
+            <div class="alert alert-info">
+                {% for message in messages %}
+                    {{message}} <br>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <table class='table bg-light table-responsive table-bordered table-sm table-hover'>
+            <tr class='table-info'>
+                <th>ID</th>
+                <th>Nom Station</th>
+                <th>Coordonnées</th>
+                <th>Météorologue Gérant</th>
+                <th>Statut</th>
+                <th colspan="4">Actions</th>
+                <th>Dernier mis à jour</th>
+            </tr>
+            {% for station in stations %}
+                <tr id='{{station.id}}' class='{% if sta == station.id %} table-secondary {% endif %}'>
+                    <td class='table-info'> {{station.id}} </td>
+                    <td> {{station.name}} </td>
+                    <td> ({{station.latitude}}; {{station.longitude}})</td>
+                    <td> {{station.meteorologist.firstname}} {{station.meteorologist.lastname}} </td>
+                    {% comment %}  {% endcomment %}
+                        <td>
+                            {% if station.statut %}
+                                <div class="spinner-grow bg-success spinner-grow-sm" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            {% else %}
+                                <div class="spinner-grow bg-danger spinner-grow-sm" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td><a href="/administration/editStation/{{station.id}}" class="btn  btn-sm btn-warning"><span class="fa fa-edit"></span></a></td>
+                        <td>
+                            <button data-bs-toggle="modal" data-bs-target="#delete{{station.id}}" class="btn btn-sm  btn-danger"><span class="fa fa-archive"></span></button>
+
+                            <div class="modal fade" id="delete{{station.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header text-white bg-info">
+                                            <h5 class="modal-title" id="exampleModalLabel"> Archiver station ?</h5>
+                                            <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            
+                                            <div class="modal-footer">
+                                            <button type="button" class="btn btn-lg btn-outline-primary" data-bs-dismiss="modal">non</button>
+                                            <a  href="/administration/trashStation/{{station.id}}" class="btn btn-outline-danger btn-lg">oui</a>
+                                            </div>
+                                        </div>
+                                </div>
+                            </div> 
+
+                        </td>
+                        <td>
+                            <button data-bs-toggle="modal" data-bs-target="#show{{station.id}}" class="btn btn-sm  btn-primary"><span class='fa fa-eye'></span></span></button>
+                            
+                            <div class="modal fade" id="show{{station.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header text-white bg-info">
+                                        <h5 class="modal-title" id="exampleModalLabel">Details station {{station}} </small> </h5>
+                                        <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        coordonées: <strong>({{station.latitude}}; {{station.longitude}}) </strong> <br>
+                                        statut: 
+                                        {% if station.statut %}<strong class="text-success">active</strong> 
+                                        {% else %}<strong class="text-danger">non actif</strong>
+                                        {% endif %} 
+                                        <br>
+                                        Météorologue en charge: {{station.meteorologist.firstname}} {{station.meteorologist.lastname}} <br>
+                                        {% comment %} {% if map %} {% endcomment %}
+                                            {{station.map | safe}}
+                                        {% comment %} {% endif %} {% endcomment %}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-lg btn-outline-info" data-bs-dismiss="modal">fermer</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>  
+                        <td>
+                            {% if station.statut %}
+                                <button data-bs-toggle="modal" data-bs-target="#des{{station.id}}" class="btn btn-sm  btn-danger">désactivé</span></button>
+                                <div class="modal fade" id="des{{station.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header text-white bg-danger">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Désactivé Station ? <small> <br> la désactivation montre que la station est hors service.</small> </h5>
+                                                    <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                    
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-lg btn-outline-primary" data-bs-dismiss="modal">non</button>
+                                                    <a  href="/administration/disableStation/{{station.id}}" class="btn btn-outline-danger btn-lg">oui</a>
+                                                </div>
+                                            </div>
+                                    </div>
+                                </div> 
+                                {% else %}
+                                <button data-bs-toggle="modal" data-bs-target="#act{{station.id}}" class="btn btn-sm  btn-success">activé</button>
+                                <div class="modal fade" id="act{{station.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header text-white bg-success">
+                                                <h5 class="modal-title" id="exampleModalLabel"> Activé Station ?</h5>
+                                                <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-lg btn-outline-danger" data-bs-dismiss="modal">non</button>
+                                                <a  href="/administration/enableStation/{{station.id}}" class="btn btn-outline-success btn-lg">oui</a>
+                                            </div>
+                                        </div>
+                                </div>
+                            </div> 
+                            {% endif %}
+                        </td> 
+                        <td style='font-weight:bold'>
+                            {% if station.updated_at %}
+                                {{station.updated_at}}
+                            {% else %}
+                                Jamais
+                            {% endif %}
+                            
+                        </td>
+                    {% comment %}  {% endcomment %}
+                </tr>
+            {% endfor %}
+        </table>
+
+    
+        <div class='alert alert-info'>
+            {% if stationLen > 1 %}
+                {{stationLen}} stations.
+            {% elif stationLen == 1 %}
+                {{stationLen}} station.
+            {% else %}
+                Aucun station n'a encore été registrer. Veuillez vérifier les archives.
+            {% endif %}
+        </div> 
+    
+    {% comment %}  {% endcomment %}
+    <!-- Button trigger modal -->
+    <p class='text-center'>
+        <button type="button" class="btn {% if not stationTrashLen %}disabled{% endif %} btn-outline-dark" data-bs-toggle="modal" data-bs-target="#showTrash">
+            voir archives station <span class='badge text-dark bg-info'>{{stationTrashLen}}</span>
+        </button>
+    </p>
+
+    <!-- Modal -->
+    <div class="modal fade" id="showTrash" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="exampleModalLabel">Archives Stations</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                
+                <table class='table table-bordered table-responsive'>
+                <tr>
+                    <th>Station</th>
+                    <th>Statut</th>
+                    <th>Date archive</th>
+                    <th>Actions</th>
+                </tr>
+                {% for station in stationsInTrash  %}
+                    <tr>
+                        <td>{{station.name}}</td>
+                        <td>
+  
+                             
+                            {% if station.statut %}
+                                <span class="text-success">active</span>
+                                {% else %}
+                                <span class="text-danger">non active</span>
+                            {% endif %}
+                         </td> 
+                         <td>
+                             {{station.trash_at| date:'D d M Y'}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        </td>
+                        <td><a href="/administration/restorStation/{{station.id}}" class='btn btn-success'><span class='fa fa-trash-restore'></span></a></td>
+                        
+                    </tr>
+
+                {% endfor %}
+                </table>
+                
+                <div class='alert alert-info'>
+                    {% if stationTrashLen > 1 %}
+                        {{stationTrashLen}} stations.
+                    {% elif stationTrashLen == 1 %}
+                        {{stationTrashLen}} station.
+                    {% else %}
+                        Aucun station archiver :)
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="modal-footer">                
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+    {% comment %}  {% endcomment %}
+    </div>
+    <div class='container'>
+        
+        <hr>
+        <h2 style='font-style:italic'>Localisation des Stations sur une carte</h2>
+        <div class="alert alert-info text-center">            
+            <i style='font-weight:bold'>Légende</i>: stations actives: <span style='border-radius:3em' class='badge bg-success'>&nbsp;</span> | stations non actives: <span style='border-radius:3em' class='badge bg-danger'>&nbsp;</span>  
+            
+        </div>
+        {% if stations %}
+            <div class="row">
+                <div class="col-sm-8 col-lg-8 offset-lg-2">
+                    {{m|safe}}
+                </div>
+            </div>
+            {% else %}
+            <div class=' alert alert-info'>
+                Aucune station n'a encore été créée.
+            </div>
+        {% endif %}
+        
+        
+    </div>
+
+{% endblock content %}

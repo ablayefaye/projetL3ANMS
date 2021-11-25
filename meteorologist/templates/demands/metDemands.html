@@ -1,0 +1,111 @@
+{% extends 'meteorologist.html' %}
+{% block title %}météorologiste - demandes{% endblock title %}
+
+{% block content %}
+    <div class='container mt-3'>
+        <h2>Mes demande(s) en attente ...</h2>
+        {% if messages %}
+            <div class='alert alert-warning mt-1'>
+                {% for message in messages %}
+                {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+        <hr>
+        <h4>Demande(s) Technicien en attente</h4>
+        {% if techniciansDemandes  %}
+        
+        <table class='bg-light table table-bordered'>
+            <tr class='table-warning'>
+                <th>Prénom</th>
+                <th>Nom</th>
+                <th>Mail</th>
+                <th>Actions</th>
+            </tr>
+            {% for technician  in techniciansDemandes %}
+                <tr>
+                    <td> {{technician.firstname}} </td>
+                    <td> {{technician.lastname}} </td>
+                    <td> {{technician.email}} </td>
+                    <td> 
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#exit{{technician.id}}">
+                        annuler demande
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="exit{{technician.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                            <div class="modal-header bg-secondary text-white">
+                                <h5 class="modal-title" id="exampleModalLabel">Êtes-vous sûre de vouloir annuler cette demande ?</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Non, annuler</button>
+                                <a href='/meteorologist/annulDemand/{{technician.id}}' class="btn btn-outline-primary">Oui, je suis sûre</a>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <div class='alert alert-warning'>
+            {{techniciansDemandes|length}} technicien{{techniciansDemandes|pluralize:'s'}}
+        </div>
+        {% else %}
+        <div class='alert alert-warning'>Liste demandes création technicien vide.</div>
+        {% endif %}
+        <hr>
+        <h4>Demande(s) Station en attente</h4>
+        {% if stationDemands  %}
+        
+        <table class='table mt-3 bg-light table-bordered table-sm table-hover'>
+            <tr>
+                <th>Nom Station</th>
+                <th>Coordonées</th>
+                <th>Actions</th>
+            </tr>
+            {% for station  in stationDemands %}
+                <tr>
+                    <td> {{station.name}} </td>
+                    <td> ({{station.latitude}}; {{station.longitude}})</td>
+                    <td> 
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#exit{{technician.id}}">
+                        annuler demande
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="exit{{technician.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                            <div class="modal-header bg-secondary text-white">
+                                <h5 class="modal-title" id="exampleModalLabel">Êtes-vous sûre de vouloir annuler cette demande ?</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Non, annuler</button>
+                                <a href='/meteorologist/annulDemandStation/{{station.id}}' class="btn btn-outline-primary">Oui, je suis sûre</a>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <div class='alert alert-warning'>
+            {{stationDemands|length}} station{{stationDemands|pluralize:'s'}}
+        </div>
+        {% else %}
+        <div class='alert alert-warning'>Liste demandes création station vide.</div>
+        {% endif %}
+        
+        
+    </div>
+{% endblock content %}

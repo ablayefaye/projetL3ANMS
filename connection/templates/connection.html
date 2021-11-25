@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Connexion{% endblock title %}
+
+{% block content %}
+    <div class='img'>
+    <div class='bg-light header text-white'>
+            <h1 class='text-center' style='text-shadow:#FFF 2px 2px 2px'>Bienvenu sur ANMS,</h1>
+            <p class='text-center text-uppercase'><span class='text-primary'>A</span>gence <span class='text-primary'>N</span>ationale de la <span class='text-primary'>M</span>étéorologie <span class='text-primary'>S</span>énégalaise</p>
+            <hr>
+    </div>
+    <div class=" container-fluid img-login">
+        {% if messages %}
+            <div class='text-center alert alert-info'>
+            {% for message in  messages%}
+                {{message}}
+            {% endfor %}
+
+            </div>
+        {% endif %}
+        {% if notGoodMail %}
+            <div class='text-center alert alert-info'>
+                {{notGoodMail}}
+            </div>
+        {% endif %}
+        <div class="row">
+            <div class="bg-light  p-3 col-sm-4 mt-3 col-lg-4 offset-lg-4 col-md-8 offset-md-2 offset-sm-4" style="margin-top: 2em;border-radius:0.2em">
+                <h2 class="text-center text-primary"><span style="font-size: 2em" class="fa fa-home"></span></h2>
+                <p class="text-center text-uppercase text-dark" style="font-style: italic;text-shadow:black 1px 0.4px 0.4px">connexion à l'application</p>
+                <hr>
+                <form action="{% url 'connection' %}" method="post">
+                    {% csrf_token %}
+                    <label class="form-label">Votre mail:</label>
+                    <p class="card-text">
+                        <input required type="email" name="email" placeholder="senprojet@gmail.com" class="form-control form-control-lg">
+                    </p>
+                    <label class="form-label">Votre mot de passe:</label>
+                    <p class="card-text">
+                        <input required type="password" name="password" placeholder="mot de passe *" class="form-control form-control-lg">
+                    </p>
+                    <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#getPassword">
+                        mot de passe oublier?
+                    </button>
+                    <p class="text-center">
+                        <button class="btn btn-sm btn-primary">
+                            Connexion
+                        </button>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="getPassword" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            
+            <div class="modal-content ">
+                
+                <form method='GET' action="{% url 'connection' %}">
+                    {% csrf_token %}
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="exampleModalLabel">Recupération compte</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            <label class='form-label'>Mail:</label>
+                            <input type='email' name='emailForGetting' value='{{emailForGetting}}' class='form-control-lg form-control' placeholder='Votre mail ...'>
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">annuler</button>
+                        <button type="submit" class="btn btn-outline-primary">recupèrer mon compte</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock content %}
+
+
+
+
+
+            

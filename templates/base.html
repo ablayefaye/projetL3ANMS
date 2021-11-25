@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+    {% load static %}
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>ANMS - {% block title %}{% endblock title %}</title>
+        <link rel="stylesheet" href=" {% static 'dist/css/bootstrap.css' %} ">
+        <link rel="stylesheet" href=" {% static 'dist/css/style.css' %} ">
+        <link rel="stylesheet" href=" {% static 'fonts/css/all.css' %} "> 
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Caladea">
+  
+        <style>
+             body {
+            font-family: 'Caladea', serif;
+                /* font-size: 40px; */
+            }
+            .img {
+            background-image: url("/static/images/blueRaine.gif"); /* The image used */
+            background-color: #cccccc; /* Used if the image is unavailable */
+            height: 700px; /* You must set a specified height */
+            background-position: center; /* Center the image */
+            background-repeat: no-repeat; /* Do not repeat the image */
+            background-size: cover; /* Resize the background image to cover the entire container */
+            }
+            .header {
+            background-image: url("/static/images/Frost.jpg"); /* The image used */
+            background-color: #cccccc; /* Used if the image is unavailable */
+            height: auto; /* You must set a specified height */
+            background-position: center; /* Center the image */
+            background-repeat: no-repeat; /* Do not repeat the image */
+            background-size: cover; /* Resize the background image to cover the entire container */
+            }
+        </style>     
+    </head>
+    <body style="background-color: #cccccc;">
+        
+        
+        
+        {% block content %}{% endblock content %}    
+        <script src="{% static 'dist/js/jquery.js' %}"></script>
+        <script src="{% static 'dist/js/bootstrap.js' %}"></script>
+
+    </body>
+</html>

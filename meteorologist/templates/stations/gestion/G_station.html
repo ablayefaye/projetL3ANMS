@@ -1,0 +1,300 @@
+{% extends 'meteorologist.html' %}
+{% block title %}détail station{% endblock title %}
+
+{% block content %}
+    <h2 class="text-center mt-1"> Station {{station}} </h2>
+    <hr>
+    <div class='container mt-3 text-center'>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+            
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav">
+                        
+                        <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class='fa fa-toolbox'></span> station
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <li><a class="dropdown-item" href="/meteorologist/G_station/{{id}}?p=details">Détails station</a></li>
+                            <li><a class="dropdown-item" href="/meteorologist/G_station/{{id}}?p=users">Utilisateurs de la station <span class='badge bg-warning' style='border-radius:1em'>{{users|length}}</span> </a></li>
+                            <li><a class="dropdown-item" href="/meteorologist/G_station/{{id}}?p=comments">Commentaires <span class='badge bg-warning' style='border-radius:1em'>{{comments|length}}</span></a></li>
+                            <li><a class="dropdown-item" href="/meteorologist/yearStatistics/{{id}}">Statistiques & tableaux</a></li>
+
+                        </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav
+        <!-- Button trigger modal -->
+            
+            {% if messages %}
+                {% for message in messages  %}
+                <div class='alert alert-warning mt-2'>
+                    {{message}}
+                </div>
+                {% endfor %}
+            {% endif %}
+        
+    </div>
+
+    <div class='container mt-5'>
+        
+        {% comment %} details {% endcomment %}
+        {% if p == 'details' %}
+            <h2 style='font-style:italic'>Détails station</h2>
+            <hr>
+            <div class='row bg-light' style='padding:1em;border-radius:1em'>
+                <div class='col-sm-6 col-lg-6 '>
+                    <i>
+                    <span class='text-success'>Nom Station : {{station.name}}</span>
+                    {% if station.statut %}
+                        <a href='/meteorologist/disableStationMet/{{station.id}}' class='btn btn-warning btn-sm'>désactiver</a>
+                        {% else %}
+                        <a href='/meteorologist/enableStationMet/{{station.id}}' class='btn btn-success btn-sm'>activé</a>
+
+                    {% endif %}
+                    <hr>
+                     <table class='table table-bordered'>
+                        <tr>
+                            <td>Coordonnées</td>
+                            <td>Latitude : {{station.latitude}} </td>
+                            <td>Longitude : {{station.longitude}} </td>
+                        </tr>
+                        <tr>
+                            <td>Statut</td>
+                            <td colspan='2'>
+                                {% if station.statut %}
+                                    <strong class='text-success'>la station est active</strong>
+                                {% else %}
+                                    <strong class='text-danger'>la station pour le moment hors service</strong>
+                                {% endif %}
+                            </td>                            
+                        </tr>
+                        <tr>
+                            <td>Total relevés</td>
+                            <td colspan="2"> {{rains|length}} </td>
+                        </tr>
+                        <tr>
+                            <td>Technicien{{techs|pluralize:'s'}}</td>
+                            <td colspan="2"> {{techs|length}} </td>
+                        </tr>
+                        <tr>
+                            <td>Département</td>
+                            <td colspan="2"> {{station.department}} </td>
+                        </tr>
+                        <tr>
+                            <td>Date mis en marche</td>
+                            <td colspan="2"> {{station.created_at}} </td>
+                        </tr>
+                        
+                        
+                    </table>
+                    </i>
+                    {% if not station.statut %}
+                    <div class='mt-4 alert alert-primary'>
+                    <!-- Button trigger modal -->
+                        
+                        {% if station.activate_at %}
+                            la date d'activation est {{station.activate_at|date:'d M Y'}} 
+                            à {{station.activate_at|date:'H'}}h 
+                            <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                Reprogrammer activation station
+                            </button>
+                            {% else %}
+                            <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                Programmer activation station
+                            </button>
+                        {% endif %}
+                            
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                            <form method='POST' action='#'>
+                                {% csrf_token %}
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-primary text-white">
+                                            <h5 class="modal-title" id="staticBackdropLabel">Programmer Activation Station {{station}}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                    <div class="modal-body text-dark">
+                                        Date:
+                                        {{form.date}}
+                                        <table>
+                                            <tr>
+                                                <td> Heure(s){{form.h}} </td>
+                                                <td> Minute(s){{form.m}} </td>
+                                                <td> Seconde(s){{form.s}} </td>
+                                            </tr>
+                                        </table>
+                                        <p class='text-dark'>
+                                            <i>Les champs heure, minute et seconde sont par défaut égals à <span class='text-primary'>00</span>. Ils sont par conséquent <span class='text-primary'>non requis</span>.</i>
+                                        </p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+                                        <button type="submit" class="btn btn-primary">Programmer activation</button>
+                                    </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+
+                <div class='col-sm-6 col-lg-6'>
+                    {{station.map|safe}}
+                
+                </div>
+            </div>
+        {% endif %}
+        {% comment %} fin details {% endcomment %}
+            
+        {% comment %} tabs {% endcomment %}
+        {% if p == 'tabs' %}
+        
+        {% endif %}    
+        {% comment %} fin tabs {% endcomment %}
+
+        {% comment %} users {% endcomment %}
+        {% if p == 'users' %}
+            <h2 style='font-style:italic'><i class='fa fa-tools'></i> Affectation/Désaffectation Technicien</h2>
+            <hr>
+             <div class='row'>
+                <div class='col-sm-6 col-lg-6'>
+                    <h4 class='text-end'>Technicien{{technicians|pluralize:'s'}} disponible{{technicians|pluralize:'s'}}</h4>
+                    <table class='table table-sm table-bordered'>
+                        {% if technicians %}
+                        {% for tech in technicians  %}
+                            <tr class='text-end'>
+                                <td> 
+                                {{tech}} <button data-bs-toggle="modal" data-bs-target="#affect{{tech.id}}"  class='btn btn-outline-success btn-sm'><span style='font-size:2em;' class='fa fa-angle-right'></span></button>
+                                <div class="modal fade" id="affect{{tech.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog text-start">
+                                    <div class="modal-content">
+                                    <div class="modal-header bg-secondary text-white">
+                                        <h5 class="modal-title" id="exampleModalLabel">Affectation ...</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Affecter {{tech.firstname}} {{tech.lastname}} à {{station}}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Non, Annuler</button>
+                                        <a href='/meteorologist/affectMetStation/{{tech.id}}/{{station.id}}' class="btn btn-danger">Oui, affecter</a>
+                                    </div>
+                                    </div>
+                                </div>
+                                </div>
+                                </td>
+
+                            </tr>
+                        {% endfor %}
+                        {% else %}
+                        <div class='alert alert-warning'>Vous ne disposez pas de techniciens disponibles</div>
+                        {% endif %}
+                        
+                    </table>
+                </div>
+                <div class='col-sm-6 col-lg-6'>
+                    
+                    <h4>Technicien{{users|pluralize:'s'}} qui gére{{users|pluralize:'nt'}} la station</h4>
+                    <table class='table table-sm table-responsive table-bordered'>
+                
+                        {% if users %}
+                        {% for tech in users  %}
+                            <tr>
+                                <td> 
+                                <button data-bs-toggle="modal" data-bs-target="#affect{{tech.id}}"  class='btn btn-outline-warning btn-sm'><span style='font-size:2em;' class='fa fa-angle-left'></span></button> {{tech}} 
+                                <div class="modal fade" id="affect{{tech.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog text-start">
+                                    <div class="modal-content">
+                                    <div class="modal-header bg-secondary text-white">
+                                        <h5 class="modal-title" id="exampleModalLabel">Retirer utilisateur ...</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Retirer {{tech.firstname}} {{tech.lastname}} sur {{station}}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Non, Annuler</button>
+                                        <a href='/meteorologist/deSaffectMetStation/{{tech.id}}/{{station.id}}' class="btn btn-danger">Oui, Retirer</a>
+                                    </div>
+                                    </div>
+                                </div>
+                                </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        {% else %}
+                        <div class='alert alert-warning'>Aucun technicien pour cette station</div>
+                        {% endif %}
+                        
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+        {% comment %} fin users {% endcomment %}
+        
+
+        {% comment %} comments {% endcomment %}
+        {% if p == 'comments' %}
+        <h2 style='font-style:italic'>Les commentaires</h2>
+        <hr>
+            <div class='row'>
+            {% for comment in comments %}
+                <div class='container'>
+                    
+                    <div class='card' style='margin-bottom:1em'>
+                        <div class='card-header'>
+                            <span style='padding:0.5em' class='badge bg-warning'> {{comment.technician.firstname}} {{comment.technician.lastname}}, {{comment.date_note | date:'D M Y'}} 
+                        </span>
+                        </div>
+                        <div clas='card-body' style='padding:1em'>
+                            {{comment.content}}
+                        </div>
+                        <div class='card-footer'>
+                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#delComment{{comment.id}}">
+                            <span class='fa fa-trash'></span>
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="delComment{{comment.id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title" id="staticBackdropLabel">Êtes-vous sûre de vouloir éffectuer cette action ?</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Non, annuler</button>
+                                    <a href='/meteorologist/G_station/{{id}}?p=comments&com={{comment.id}}' class='btn btn-outline-danger'>Oui, je suis sûre</a>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+            {% endfor %}
+            </div>
+            {% if comments %}
+                <div class='alert alert-warning'>
+                    {{comments|length}} commentaire{{comments|pluralize:'s'}}
+                </div>
+            {% else %}
+                <div class='alert alert-warning'>
+                    Pas de commentaires pour cette station.
+                </div>
+            {% endif %}
+            
+        {% endif %}
+        {% comment %} fin comments {% endcomment %}
+    </div>
+{% endblock content %}

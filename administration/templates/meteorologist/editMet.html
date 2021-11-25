@@ -1,0 +1,44 @@
+{% extends 'admin.html' %}
+{% block title %}technicien - modifier {% endblock title %}
+
+{% block content %}
+    
+        <div class='container-md mt-5'>
+            {% if emailNotOk %}
+            <div class="alert alert-info"> {{emailNotOk}} </div>
+            {% endif %}
+            {% if errorTel %}
+                <div class="alert alert-info"> <strong>{{errorTel}}</strong> </div>
+            {% endif %}
+            {% if errorFirstname %}
+                <div class="alert alert-info"> <strong>{{errorFirstname}}</strong> </div>
+            {% endif %}
+            {% if errorLastname %}
+                <div class="alert alert-info"> <strong>{{errorLastname}}</strong> </div>
+            {% endif %}
+            <div class="bg-light p-3 text-dark">
+            <div class="row">
+                <div class="col-sm-8 offset-sm-2 col-lg-6 offset-lg-3">
+                <form action="#" method="POST">
+                    
+                    <h2 style='text-shadow:#000 1px 1px 1px;font-style:italic'>Modifier météorologue</h2>
+                    <hr>
+                    {% csrf_token %}
+                   {{formEdit.as_p}}
+                    <p class='text-center'>
+                        <a href='{% url 'gestion_meteorologist' %}' class='btn btn-secondary btn-lg'>annuler</a>
+                    
+                        <button type='submit' class='btn btn-outline-secondary btn-lg'>modifier météorologue</button>
+                    </p>
+                    
+                    </form>
+                </div>
+                
+            </div>
+            </div>
+
+
+
+        </div>
+    
+{% endblock content %}

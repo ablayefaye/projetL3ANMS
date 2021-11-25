@@ -1,0 +1,92 @@
+{% extends 'admin.html' %}
+
+{% block title %}
+    rechercher
+{% endblock title %}
+
+{% block content %}
+    {% load static %}
+    {% if user.role == 'technicien' %}
+        <div class='container mt-5'>
+            <a href='/administration/gestion_technician' class='btn btn-info btn-sm'>retourner</a>
+            <hr>
+            <div class='row'>
+                <div class='col-lg-4 p-2 text-center bg-light'>
+                    <img style="border-radius: 10em;width:auto;height:10em;" src="{%if user.profile %}/media/{{user.profile}}{%else%} {% static 'images/default.png' %} {%endif%}" alt="">
+                    <br>
+                    <i>
+                        <p>Technicien {{user.firstname}} {{user.lastname}},<br> @mail {{user.email}}</p>
+                    </i>
+                </div>
+                <div class='col-lg-8'>
+                    <p>Prenom: <i> {{user.firstname}} </i><p>
+                    <p>Nom: <i> {{user.lastname}} </i><p>
+                    <p>Adresse: <i> {{user.address}} </i><p>
+                    <p>Téléphone: <i> {{user.tel}} </i><p>
+                    <hr>
+                    <div class='alert alert-info mt-5'>
+                        <a href='/administration/editTech/{{user.id}}' class='btn btn-outline-warning'>modifier</a>
+                        <a href='/administration/trashTechnician/{{user.id}}' class='btn btn-outline-danger'>archiver</a>
+                        {% if user.statut %}
+                            <a href='/administration/disableTech/{{user.id}}' class='btn btn-danger'>désactiver</a>
+                            {% else %}
+                            <a href='/administration/enableTech/{{user.id}}' class='btn btn-success'>artiver</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+
+        <div class='container mt-5'>
+            <a href='/administration/gestion_meteorologist' class='btn btn-info btn-sm'>retourner</a>
+            <hr>
+            <div class='row'>
+                <div class='col-lg-4 p-2 text-center bg-light'>
+                    
+                    <img style="border-radius: 10em;width:auto;height:10em;" src="{%if user.profile %}/media/{{user.profile}}{%else%} {% static 'images/default.png' %} {%endif%}" alt="">
+                    <br>
+                    <i>
+                        <p>Météorologue {{user.firstname}} {{user.lastname}},<br> @mail: {{user.email}}</p>
+                    </i>
+                </div>
+                <div class='col-lg-8'>
+                    <p>Prenom: <i> {{user.firstname}} </i><p>
+                    <p>Nom: <i> {{user.lastname}} </i><p>
+                    <p>Adresse: <i> {{user.address}} </i><p>
+                    <p>Téléphone: <i> {{user.tel}} </i><p>
+                    <hr>
+                    <div class='alert alert-info mt-5'>
+                        <a href='/administration/editMet/{{user.id}}' class='btn btn-outline-warning'>modifier</a>
+                        <a href='/administration/trashMet/{{user.id}}' class='btn btn-outline-danger'>archiver</a>
+                        {% if user.statut %}
+                            <a href='/administration/disableMet/{{user.id}}' class='btn btn-danger'>désactiver</a>
+                            {% else %}
+                            <a href='/administration/enableMet/{{user.id}}' class='btn btn-success'>artiver</a>
+                        {% endif %}
+                       
+                        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                ...
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary"> changes</button>
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    
+{% endblock content %}

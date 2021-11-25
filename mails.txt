@@ -1,0 +1,9 @@
+compte 1:
+email: projetlicence3web1.gmail.com
+pass: projetlicence
+nom: mail1 mail1
+_________________
+compte 2:
+email: projetlicence3web2.gmail.com
+pass: projetlicence
+nom: mail1 mail1

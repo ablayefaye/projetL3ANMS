@@ -1,0 +1,58 @@
+{% extends 'technician.html' %}
+{% block title %} meteorologist - accueil{% endblock title %}
+
+{% block content %}
+    <div class='container mt-5'>
+        {% if messages %}
+            {% for message in messages  %}
+            <div class='alert alert-success'>
+                {{message}}
+            </div>
+            {% empty %}{% endfor %}
+        {% endif %}
+        <p>
+            <h2 class='text-white text-center'>Bienvenu sur l'espace Technicien de <strong class='text-dark'>ANMS</strong>,</h2>
+            <div class='card-body' style='font-style:italic;'>{% lorem 1 b  %}</div>  
+        </p>
+        <hr>
+        <h2 style='font-style:italic'>Camarades Technicens et ma Station</h2>
+        <div class='alert alert-info row' style='font-size: 1.5em'>
+           
+            <div class='col-6 border p-4'>
+                <h2><span class=' text-warning fa fa-users'></span> mes camarades techniciens</h2>
+                <table class='table table-bordered table-sm'>
+                    {% if not isListEmpty %}
+                    
+                    {% for t  in techs %}
+                        {% if t.id != tech.id %}
+                            <tr>
+                                <td> {{t}} </td>
+                            </tr>
+                        {% endif %}
+                        
+                    {% endfor %}
+                    
+                    {% else %}
+                    <div class='alert alert-warning'>
+                        Votre liste de camarades est vide.
+                    </div>
+                    {% endif %}
+                </table>
+            </div>
+            <div class='col-6 border p-4'>
+                <h2><span class='fa fa-toolbox text-warning'></span> Stations</h2>
+                statut: {% if tech.station.statut %}<span class='text-success'>En activité</span>
+                        {% else %}
+                        <span class='text-danger'>En activité</span>
+                        {% endif %}
+                <br>
+                Total relevé: {{rains}}<br>
+                Date de mis en marche: {{tech.station.created_at|date}}
+                <div class='text-center'>
+                    <a class='btn btn-lg btn-outline-warning' href='{% url 'techStation' %}'>voir plus</a>
+                </div>
+            </div>
+        </div>
+        <hr>
+    </div>
+{% endblock content %}

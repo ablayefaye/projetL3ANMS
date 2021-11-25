@@ -1,0 +1,333 @@
+{% extends 'admin.html' %}
+{% block title %}gestion station - liste{% endblock title %}
+
+{% block content %}
+    
+    <div class='container mt-1'>
+        <h2 style='text-shadow:#000 1px 1px 1px;font-style:italic'>Liste Techniciens</h2>
+        {% comment %}  {% endcomment %}
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-light " data-bs-toggle="modal" data-bs-target="#rech">
+            <span class='fa fa-search'> technician</span>
+        </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="rech" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="exampleModalLabel">Saisir Mail technicien à rechercher</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input id="search_here" class="form-control mb-3" placeholder="Saisir Mail ..." />
+                <div id="box"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+            </div>
+            </div>
+        </div>
+        </div>
+    
+    {% comment %}  {% endcomment %}
+        
+        <p class='text-end '>
+            <button data-bs-toggle="modal" data-bs-target="#addTechncian" class='btn btn-sm btn-info'><span class='fa fa-plus'>&nbsp;ajouter technicien</span></button>
+            <div class="modal fade" id="addTechncian" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <form action="{% url 'gestion_technician' %}" method="post">
+                            {% csrf_token %}
+                            <div class="modal-content">
+                                <div class="modal-header text-white bg-info">
+                                <h5 class="modal-title" id="exampleModalLabel"> <span class="fa fa-plus"></span>&nbsp;Ajouter Technicien</h5>
+                                <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    {{formAdd.as_p}}
+                                </div>
+                                <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+                                <button type="submit" class="btn btn-info">créer technicien</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+            </div>
+        </p>
+        {% if messages %}
+            <div class="alert alert-info">
+                {% for message in messages %}
+                    {{message}}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if technicians %}
+        
+        {% if addOk %}
+            <div class="alert alert-info"> {{addOk}} </div>
+        {% endif %}
+        {% if trashOk %}
+            <div class="alert alert-info"> {{trashOk}} </div>
+        {% endif %}
+        {% if emailNotOk %}
+            <div class="alert alert-info"> {{emailNotOk}} </div>
+        {% endif %}
+        {% if errorTel %}
+            <div class="alert alert-danger"> {{errorTel}} </div>
+        {% endif %}
+         {% if errorConnection %}
+            <div class="alert alert-info"> {{errorConnection}} </div>
+        {% endif %}
+        
+        {% if errorFirstname %}
+                <div class="alert alert-danger"> {{errorFirstname}} </div>
+            {% endif %}
+            {% if errorLastname %}
+                <div class="alert alert-danger"> {{errorLastname}} </div>
+            {% endif %}
+            
+        <table class="table bg-light table-responsive table-bordered table-sm table-hover">
+            <tr class="table-info">
+                <td>ID</td>
+                <th>Prénom</th>
+                <th>Nom</th>
+                <th>Adresse email</th>
+                <th>Téléphone</th>
+                <th>Statut</th>
+                <th colspan="5" class="text-center">action</th>
+                <th>Dernière connexion</th>
+            </tr>
+            {% for technician in technicians %}
+                <tr >
+                    <td class='table-info'> {{technician.id}} </td>
+                    <td> {{technician.firstname}} </td>
+                    <td>{{technician.lastname}}</td>
+                    <td>{{technician.email}}</td>
+                    <td>{{technician.tel}}</td>
+                    <td>
+                        {% if technician.statut %}
+                            <div class="spinner-grow bg-success spinner-grow-sm" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        {% else %}
+                            <div class="spinner-grow bg-danger spinner-grow-sm" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td><a href="/administration/editTech/{{technician.id}}" class="btn  btn-sm btn-warning"><span class="fa fa-edit"></span></a></td>
+                    <td>
+                        <button data-bs-toggle="modal" data-bs-target="#delete{{technician.id}}" class="btn btn-sm  btn-danger"><span class="fa fa-archive"></span></button>
+
+                        <div class="modal fade" id="delete{{technician.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header text-white bg-info">
+                                        <h5 class="modal-title" id="exampleModalLabel"> Archiver technicien ?</h5>
+                                        <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        
+                                        <div class="modal-footer">
+                                        <button type="button" class="btn btn-lg btn-outline-primary" data-bs-dismiss="modal">non</button>
+                                        <a  href="/administration/trashTechnician/{{technician.id}}" class="btn btn-outline-danger btn-lg">oui</a>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div> 
+
+                    </td>
+                    <td>
+                        <button data-bs-toggle="modal" data-bs-target="#show{{technician.id}}" class="btn btn-sm  btn-primary"><span class='fa fa-eye'></span></span></button>
+                        
+                        <div class="modal fade" id="show{{technician.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header text-white bg-info">
+                                    <h5 class="modal-title" id="exampleModalLabel">Details {{technician.firstname}} {{technician.lastname}} </small> </h5>
+                                    <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    {% load static %}
+                                    <div class='text-center'>
+                                    <img style='border-radius:0.5em;width:auto; height:20em;' src="{%if technician.profile %}/media/{{technician.profile}}{%else%} {% static 'images/default.png' %} {%endif%}">
+                                    </div>
+                                    <br>
+                                    <strong class="text-info">Prénom:</strong> {{technician.firstname}} <br>
+                                    <strong class="text-info">Nom:</strong> {{technician.lastname}} <br>
+                                    <strong class="text-info">Adresse:</strong> {{technician.address}} <br>
+                                    <strong class="text-info">Téléphone:</strong> {{technician.tel}} <br>
+                                    <strong class="text-info">Email:</strong> {{technician.email}} <br>
+                                    <strong class="text-info">Météologue sous titutel:</strong> {{technician.meteorologist}} <br>
+                                    <strong class="text-info">Statut:</strong> {% if technician.statut %}<strong class="text-success">active</strong> {% else %}<strong class="text-danger">non actif</strong>{% endif %} <br>
+                                </div>
+                                <div class="modal-footer">
+                                       
+                                    <button type="button" class="btn btn-lg btn-outline-info" data-bs-dismiss="modal">fermer</button>
+                                </div>
+                            </div>
+                        </div>
+                    </td>  
+                    <td>
+                        {% if technician.statut %}
+                            <button data-bs-toggle="modal" data-bs-target="#des{{technician.id}}" class="btn btn-sm  btn-danger">désactivé</span></button>
+                            <div class="modal fade" id="des{{technician.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header text-white bg-danger">
+                                                <h5 class="modal-title" id="exampleModalLabel">Désactivé Techinicien ? <small> <br> la désactivation retir tous les priviléges à ce technicien.</small> </h5>
+                                                <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                                
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-lg btn-outline-primary" data-bs-dismiss="modal">non</button>
+                                                <a  href="/administration/disableTech/{{technician.id}}" class="btn btn-outline-danger btn-lg">oui</a>
+                                            </div>
+                                        </div>
+                                </div>
+                            </div> 
+                            {% else %}
+                            <button data-bs-toggle="modal" data-bs-target="#act{{technician.id}}" class="btn btn-sm  btn-success">activé</button>
+                            <div class="modal fade" id="act{{technician.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header text-white bg-success">
+                                            <h5 class="modal-title" id="exampleModalLabel"> Activé technicien ?</h5>
+                                            <button type="button" class="btn-close btn-danger" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-lg btn-outline-danger" data-bs-dismiss="modal">non</button>
+                                            <a  href="/administration/enableTech/{{technician.id}}" class="btn btn-outline-success btn-lg">oui</a>
+                                        </div>
+                                    </div>
+                            </div>
+                        </div> 
+                        {% endif %}
+                    </td>  
+                    <td>
+                    
+                    <button type="button" class="btn btn-sm btn-outline-dark" data-bs-toggle="modal" data-bs-target="#changeStation{{technician.id}}">
+                       changer de station
+                    </button>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="changeStation{{technician.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                        <div class="modal-header bg-info text-white">
+                            <h5 class="modal-title" id="exampleModalLabel">changement station pour {{technician.firstname}} {{technician.lastname}}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            {% for station in stationsChoice %}
+                                {% if station.meteorologist == technician.meteorologist %}
+                                    {% if station == technician.station %}
+                                    <p><a href='/administration/changeStationForTech/{{technician.id}}/{{station.id}}' class='btn btn-primary'>{{station}}</a></p>
+                                    {% else %}
+                                    <p><a href='/administration/changeStationForTech/{{technician.id}}/{{station.id}}' class='btn btn-outline-primary'>{{station}}</a></p>
+                                    {% endif %}
+                                {% endif %}
+                                
+                            {% endfor %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">annuler</button>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                    </td>
+                    <td style='font-weight:bold'>
+                        {% if technician.is_online %}
+                        <span class='text-success'>En ligne</span>
+                        {% elif technician.last_connection%}
+                            {{technician.last_connection}}
+                        {% else %}
+                            Jamais
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <div class='alert alert-info'>
+            {% if techLen > 1 %}
+                {{techLen}} techniciens.
+            {% elif techLen == 1 %}
+                {{techLen}} technicien.
+            {% endif %}
+        </div>
+    {% else %}
+        <div class='alert alert-info'>Aucun technicien n'est encore registrer dans la base de données. Vérifier dans <a href="">Corbeil</a> </div>
+    {% endif %}
+    <!-- Button trigger modal -->
+    <p class='text-center'>
+        <button type="button" class="btn {% if not techTrashLen %}disabled{% endif %} btn-outline-dark" data-bs-toggle="modal" data-bs-target="#showTrash">
+            voir archives technicien <span class='badge bg-info'>{{techTrashLen}}</span>
+        </button>
+    </p>
+
+    <!-- Modal -->
+    <div class="modal  fade" id="showTrash" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="exampleModalLabel">Archives techniciens</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                
+                <table class='table table-responsive table-sm table-bordered'>
+                <tr>
+                    <th> ID </th>
+                    <th>Technicien</th>
+                    <th>Email</th>
+                    <th>Date archive</th>
+                    <th >Actions</th>
+                </tr>
+                {% for technician in techniciansInTrash  %}
+                    <tr>
+                        <td > {{technician.id}} </td>
+                        <td>
+                            {{technician.firstname}} {{technician.lastname}} <br> 
+                         </td>
+                          <td>
+                             {{technician.email}}
+                         </td> 
+                         <td>
+                            {{technician.trash_at| date:'D d M Y'}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        </td>
+                        <td><a href="/administration/restorTechnician/{{technician.id}}" class='btn btn-success'><span class='fa fa-trash-restore'></span></a></td>
+                    </tr>
+
+                {% endfor %}
+                </table>
+                
+                <div  class='alert alert-dark'>
+                    {% if techTrashLen > 1 %}
+                        {{techTrashLen}} techniciens.
+                    {% elif techTrashLen == 1 %}
+                        {{techTrashLen}} technicien.
+                    {% else %}
+                        Aucun technicien archiver :)
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                
+                
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+            </div>
+            </div>
+        </div>
+        </div>
+    </div>
+     
+{% endblock content %}
+
+
+
+
+

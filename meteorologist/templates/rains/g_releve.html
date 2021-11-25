@@ -1,0 +1,89 @@
+{% extends 'meteorologist.html' %}
+{% block title %}météorologue| relevé{% endblock title %}
+{% block content %}
+    <h2 class='text-center mt-5' style='font-style:italic'>Relevé récents effectuer sur la station de {{station}}</h2>
+    <hr>
+    <div class='container'>
+    <form method='POST' action='#'>
+        {% csrf_token %}
+        <div class='row'>
+            
+            <div class='col-sm-10'>
+             
+                <select name='stat'  class='form-control'>
+                    {% for s in stations %}
+                        {% if s.id == station.id %}
+                            <option value='{{s.id}}' selected>{{s.name}}</option>
+                        {% else %}
+                            <option value='{{s.id}}'>{{s.name}}</option>
+                        {% endif %}
+                        
+                    {% endfor %}
+                </select>
+            
+            </div>
+            <div class='col-sm-2'>
+                <button class='btn btn-primary' type='submit'>sélectioner station</button>
+            </div>
+            
+            {% if error or ok %}
+                <div class='alert alert-warning mt-5'>
+                    {{error}} {{ok}}
+                </div>
+            {% endif %}
+            
+        </div>
+       </form>
+        {% if noStation %}
+            {{noStation}}
+        {% else %}
+            {% if rains %}
+            <table class='mt-5 table table-warning table-bordered table-responsive'>
+                <tr>
+                    <th>valeur</th>
+                    {% for r in rains %}
+                        <td>
+                            <button data-bs-toggle="modal" data-bs-target="#edit{{r.id}}" class='btn btn-outline-primary btn-sm'> {{r.value}} </button>
+                            <div class="modal fade" id="edit{{r.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <form action='#' method='GET'>
+                                    {% csrf_token %}
+                                    <div class="modal-content">
+                                    <div class="modal-header bg-secondary text-white">
+                                        <h5 class="modal-title" id="exampleModalLabel">Modification relevé {{r.id}} </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <input type='hidden' name='id' value='{{r.id}}'>
+                                        <input type='hidden' name='stat' value='{{station.id}}'>
+                                        <input required type='text' name='v' value='{{r.value}}' class='form-control'>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Non, Annuler</button>
+                                        <button type='submit' class="btn btn-danger">Oui, modifier</button>
+                                    </div>
+                                    </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <th>Date</th>
+                    {% for r in rains %}
+                        <td>
+                            {{r.created_at|date:'d/m/Y'}}
+                        </td>
+                    {% endfor %}
+                </tr>
+            </table>
+            {% else %}
+            <div class='alert alert-warning mt-5'>
+                Cette station n'a pas encore enregistrer de relevés.
+            </div>
+            {% endif %}
+        {% endif %}
+    </div>
+    {{years}}
+{% endblock content %}

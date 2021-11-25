@@ -1,0 +1,195 @@
+{% extends 'admin.html' %}
+
+{% block title %}demandes - liste{% endblock title %}
+
+{% block content %}
+    <h1 class='text-center' style='text-shadow:#000 1px 1px 1px;font-style:italic'>Demande(s) en attentes ...</h1>
+    
+    <div class='container mt-2'>
+        {% if messages %}
+            <div class="alert alert-info">
+                {% for message in messages %}
+                    {{message}}
+                {% endfor %}
+            </div>
+        {% endif %}
+        <hr>
+
+        <h2 class='text-center' style='text-shadow:#000 1px 1px 1px;font-style:italic'>Technicien(s) en attente de validation ...</h2>
+        {% if technicians %} 
+            <table class='table table-light table-responsive table-bordered table-hover'>
+                <tr class='table-info'>
+                    <th>Prénom technicien</th>
+                    <th>Nom technicien</th>
+                    <th>Adresse Mail technicien</th>
+                    <th>Méteorologue demandeur</th>
+                    <th colspan='2'>Actions</th>
+                </tr>
+                {% for technician in technicians  %}
+                    <tr>
+                        <td>{{technician.firstname}} </td>
+                        <td>{{technician.lastname}} </td>
+                        <td>{{technician.email}} </td>
+                        <td>{{technician.meteorologist}} </td>
+                        <td>
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#valider{{technician.id}}">
+                                valider
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="valider{{technician.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                <div class="modal-header bg-info">
+                                    <h5 class="modal-title text-white" id="exampleModalLabel">Êtes-vous sûre de vouloir valider la demande ?</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Non, annuler</button>
+                                    <a href="/administration/acceptDemand/{{technician.id}}" class="btn btn-success">Oui, je suis sûre</a>
+                                </div>
+                                </div>
+                            </div>
+                            </div>
+                        </td>
+                        <td>
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejeter{{technician.id}}">
+                                rejeter
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="rejeter{{technician.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <form method='POST' action="/administration/declineDemand/{{technician.id}}">
+                                    {% csrf_token %}
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-danger">
+                                            <h5 class="modal-title text-white" id="exampleModalLabel">Message de rejet demande</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class='modal-body'>
+                                            <textarea class='form-control' required placeholder='Message de rejet création technicien *' name='message' autofocus></textarea>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+                                            <button type='submit' class="btn btn-danger">Envoyer</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+            {% if demandesTech == 1 %}
+                <div class='alert alert-info'>
+                    {{demandesTech}} technicien
+                </div>
+                {% elif demandesTech > 1%}
+                <div class='alert alert-info'>
+                    {{demandesTech}} techniciens
+                </div>
+                
+            {% endif %}
+            
+        {% else %}
+        <div class='alert alert-warning'>
+            Pas de demande de création de techniciens en attentes ...
+        </div>
+        {% endif %}
+    </div>
+
+
+    <div class='container mt-5'>
+        
+        <hr>
+
+        <h2 class='text-center' style='text-shadow:#000 1px 1px 1px;font-style:italic'>Station(s) en attente de validation ...</h2>
+        {% if stations %}
+            <table class='table table-light table-bordered table-responsive'>
+                <th>Nom Station</th>
+                <th>Latitude station</th>
+                <th>Longitude station</th>
+                <th>Méteorologue demandeur</th>
+                <th colspan='2'>Actions</th>
+                {% for station in stations  %}
+                    <tr>
+                        <td>{{station.name}} </td>
+                        <td>{{station.latitude}} </td>
+                        <td>{{station.longitude}} </td>
+                        <td>{{station.meteorologist}} </td>
+                        <td>
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#valider{{station.id}}">
+                                valider
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="valider{{station.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                <div class="modal-header bg-info">
+                                    <h5 class="modal-title text-white" id="exampleModalLabel">Êtes-vous sûre de vouloir valider la demande ?</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Non, annuler</button>
+                                    <a href="/administration/acceptDemandStation/{{station.id}}" class="btn btn-success">Oui, je suis sûre</a>
+                                </div>
+                                </div>
+                            </div>
+                            </div>
+                        </td>
+                        <td>
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejeter{{station.id}}">
+                                rejeter
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="rejeter{{station.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <form method='POST' action="/administration/declineDemandStation/{{station.id}}">
+                                    {% csrf_token %}
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-danger">
+                                            <h5 class="modal-title text-white" id="exampleModalLabel">Message de rejet demande</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class='modal-body'>
+                                            <textarea class='form-control' required placeholder='Message de rejet création station *' name='message' autofocus></textarea>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+                                            <button type='submit' class="btn btn-danger">Envoyer</button>
+                                        </div>
+                                    </div>
+                                </form>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+            {% if demandesStation == 1 %}
+                <div class='alert alert-info'>
+                    {{demandesStation}} station
+                </div>
+                {% elif demandesStation > 1 %}
+                <div class='alert alert-info'>
+                    {{demandesStation}} stations
+                </div>
+                
+            {% endif %}
+            
+        {% else %}
+        <div class='alert alert-warning'>
+            Pas de demande de création de station en attente ...
+        </div>
+        {% endif %}
+    </div>
+{% endblock content %}

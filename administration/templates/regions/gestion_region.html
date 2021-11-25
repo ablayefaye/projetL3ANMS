@@ -1,0 +1,142 @@
+{% extends 'admin.html' %}
+
+{% block title %}Régions{% endblock title %}
+
+{% block content %}
+
+    <div class='container mt-1'>
+        <h2 style='text-shadow:#000 1px 1px 1px;font-style:italic'>Liste Régions</h2>
+        <input id="search_here" class="form-control mb-3" placeholder="Nom de la région à rechercher ici svp.." />
+        <div id="box"></div>
+        <p class='text-end'>
+            <!-- Button trigger modal -->
+        <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#addRegion">
+            <span class='fa fa-plus'>&nbsp;ajouter région</span>
+        </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="addRegion" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <form method='POST' action="{% url 'gestion_regions' %}">
+            {% csrf_token %}
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-info text-white">
+                        <h5 class="modal-title" id="exampleModalLabel">Formulaire création région</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        {{formAddRegion}}
+                    </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+                    <button type="submit" class="btn btn-primary">créer region</button>
+                </div>
+                </div>
+            </div>
+            </form>
+        </div>
+        </p>
+        {% if messages %}
+            <div class="alert alert-info">
+                {% for message in messages %}
+                    {{message}}
+                {% endfor %}
+            </div>
+        {% endif %}
+        <table class='table bg-light table-responsive table-bordered table-sm table-hover'>
+            <tr class='table-info'>
+                <th>Régions</th>
+                <th colspan='4'>Actions</th>
+            </tr>
+            {% for region in regions %}
+                <tr id='{{region.id}}' class='{% if reg == region.id %}table-primary{% endif %}'>
+                    <td>{{region.name}}</td>
+                    <td><a href='/administration/editRegion/{{region.id}}' class='btn btn-outline-warning'><span class='fa fa-edit'></span></a></td>
+                    <td>
+                    {% comment %}  {% endcomment %}
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#delete{{region.id}}">
+                        <span class='fa fa-trash'></span>
+                    </button>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="delete{{region.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                        <div class="modal-header bg-info">
+                            <h5 class="modal-title text-white" id="exampleModalLabel">Êtes-vous sûre de vouloir supprimer cette région ?</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Non, annuler</button>
+                            <a href="/administration/deleteRegion/{{region.id}}" class="btn btn-primary">Oui, je suis sûre</a>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                    {% comment %}  {% endcomment %}
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="modal" data-bs-target="#showRegion{{region.id}}">
+                            <span class='fa fa-list'>&nbsp;liste départements </span>
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id="showRegion{{region.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                <div class="modal-header bg-info text-white">
+                                    <h5 class="modal-title" id="exampleModalLabel">&nbsp;Liste départements de {{region}}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p class='text-end'>
+                                        <a href='/administration/regionAddDept/{{region.id}}' class='btn btn-outline-info'><span class='fa fa-plus text-dark'>&nbsp;</span>département</a>
+                                    </p>
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <th>Départements</th>
+                                            <th>actions</th>
+                                        </tr>
+                                        
+                                        {% for dept in departments %}
+                                        
+                                            {% if dept.region == region %}
+                                                <tr>
+                                                    <td>{{dept.name}}</td>
+                                                    <td class='text-center'>
+                                                        <a href='/administration/deleteDept/{{dept.id}}' class='btn btn-sm btn-danger'><span class='fa fa-trash fa-sm'></span></a>
+                                                        <a href='/administration/editDept/{{dept.id}}' class='btn btn-sm  btn-warning'><span class='fa fa-edit fa-sm'></span></a>
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">fermer</button>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% if regionLen == 0%}
+            <div class='alert alert-info'>
+                pas de region enregistrer
+            </div>
+            {% elif regionLen == 1%}
+                <div class='alert alert-info'>
+                {{regionLen}} région
+                </div>
+            {% else %}
+            <div class='alert alert-info'>
+                {{regionLen}} régions
+            </div>
+        {% endif %}
+    </div>
+{% endblock content %}
+
+

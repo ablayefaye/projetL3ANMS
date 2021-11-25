@@ -1,0 +1,107 @@
+{% extends 'admin.html' %}
+{% block title %} administration - accueil{% endblock title %}
+
+{% block content %}
+    <div class='container mt-5'>
+        {% if messages %}
+            {% for message in messages  %}
+            <div class='alert alert-success'>
+                {{message}}
+            </div>
+            {% empty %}{% endfor %}
+        {% endif %}
+        <p>
+
+            <h2 class='text-white  text-center'>Bienvenu sur l'espace d'administration de <strong class='text-dark'>ANMS</strong>,</h2>
+            <div class='card-body' style='font-style:italic;'>{% lorem 1 b  %}</div>  
+        </p>
+        <hr>
+        <h2 style='font-style:italic'>Utilisateurs et Stations</h2>
+        <div class='alert alert-warning row' style='font-size: 1.5em'>
+            <div class='col-4 border p-4'>
+                <h2><span class='fa fa-users text-info'></span> Météorologues</h2>
+                actif: {{metsActifs}}<br> 
+                inactif: {{metsInactifs}} <br>
+                total: {{mets}} <br>
+                <div class='text-center'>
+                    <a class='btn btn-lg btn-outline-info' href='gestion_meteorologist'>voir plus</a>
+                </div>
+            </div>
+            <div class='col-4 border p-4'>
+                <h2><span class=' text-info fa fa-users'></span> Techniciens</h2>
+                actif: {{techActifs}}<br> 
+                inactif: {{techInactifs}} <br>
+                total: {{techs}} <br>
+                <div class='text-center'>
+                    <a class='btn btn-lg btn-outline-info' href='gestion_technician'>voir plus</a>
+                </div>
+            </div>
+            <div class='col-4 border p-4'>
+                <h2><span class='fa fa-toolbox text-info'></span> Stations</h2>
+                actif: {{stationActifs}}<br> 
+                inactif: {{stationInactifs}} <br>
+                total: {{stations}} <br>
+                <div class='text-center'>
+                    <a class='btn btn-lg btn-outline-info' href='gestion_station'>voir plus</a>
+                </div>
+            </div>
+        </div>
+        <hr>
+    </div>
+    {% comment %}  {% endcomment %}
+    <div class='container mt-5'>
+    <h2 style='font-style:italic'>Profil: météorologue et techniciens</h2>
+    <div class='row bg-light'>
+        <div class='p-5 col-sm-4 offset-sm-4'>
+            <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                {% for user in users %}
+                    {% if forloop.counter == 1 %}
+                        <div class="carousel-item active">
+                            <img style='width:auto;height:20em;border-radius:200em' src="/media/{{user.profile}}" class="d-block w-100" alt="...">
+                            <div style='font-weight:bold; font-style:italic' class="carousel-caption text-info d-none d-md-block">
+                                <h5> profile: {{user.role}} </h5>
+                                
+                                <p>{{user}}</p>
+                                {% if user.role == 'technicien' %}
+                                    <a href='/administration/resultSearch/{{user.id}}/technicien' class='btn btn-info'>voir</a>
+                                {% endif %}
+                                
+                            </div>
+                        </div>
+                    {% else %}
+                    {% load static %}
+                        <div class="carousel-item">
+                            <img style='width:auto;height:20em;border-radius:200em' src="{% if user.profile %}/media/{{user.profile}} {% else %}{% static 'images/default.png' %}{% endif %}" class="d-block w-100" alt="...">
+                            <div style='font-weight:bold; font-style:italic' class="carousel-caption text-info d-none d-md-block">
+                                <h5> profile: {{user.role}} </h5>
+                                <p>{{user}}</p>
+                                {% if user.role == 'technicien' %}
+                                    <a href='/administration/resultSearch/{{user.id}}/technicien' class='btn btn-info'>voir</a>
+                                {% elif user.role == 'meteorologue' %}
+                                
+                                    <a href='/administration/resultSearch/{{user.id}}/meteorologue' class='btn btn-info'>voir</a>
+
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                
+            </div>
+            <button class="bg-transparent border-0 carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon bg-info" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="bg-transparent border-0 carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+                <span class="carousel-control-next-icon bg-info" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+            </div>
+        </div>
+    </div>
+    </div>
+   
+
+    {% comment %}  {% endcomment %}
+{% endblock content %}

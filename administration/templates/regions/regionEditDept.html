@@ -1,0 +1,25 @@
+{% extends 'admin.html' %}
+{% block title %}region - modifier département{% endblock title %}
+
+
+{% block content %}
+    <div class='container mt-5'>
+        <a href="/administration/gestion_regions/" class="btn btn-sm btn-outline-info">retourner à régions</a>
+        <div class='row mt-1 bg-light'>
+        
+        <div class='col-sm-6 mt-5 offset-sm-3 col-lg-6 offset-lg-3 col-md-8 offset-md-2'>
+            <h2 class='text-center ' style='text-shadow:#000 1px 1px 1px;font-style:italic'>Modifier Département de la region de <span class='text-info'>{{region}}</span></h2>
+            <hr> 
+            <form method='POST' action="/administration/editDept/{{id}}">
+                {% csrf_token %}
+                <p>
+                    {{formEditDept.name}}
+                </p>
+                <p class='text-center'>
+                    <button class='btn btn-lg btn-outline-secondary' type='submit'>Modifier département</button>
+                </p>
+            </form>
+        </div>
+        </div>
+    </div>
+{% endblock content %}
